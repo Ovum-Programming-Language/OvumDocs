@@ -96,12 +96,6 @@ The `sys` namespace provides essential system operations including I/O, time, pr
 * `sys::ForceGarbageCollection(): Void` - Forces garbage collection
 * `sys::GetProcessorCount(): Int` - Returns number of available CPU cores
 
-## Network Operations
-
-* `sys::ResolveHostname(hostname: String): String?` - Resolves hostname to IP address
-* `sys::IsPortOpen(host: String, port: Int): Bool` - Checks if TCP port is open
-* `sys::GetLocalIpAddress(): String?` - Returns local machine's IP address
-
 ## System Information
 
 * `sys::GetOsName(): String` - Returns operating system name
