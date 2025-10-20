@@ -37,7 +37,7 @@ fun Main(args: StringArray): Int {
     var i: Int = 1
     
     while i <= 5 {
-        PrintLine(ToString(i))
+        sys::PrintLine(ToString(i))
         i = i + 1
     }
     
@@ -102,7 +102,7 @@ fun CalculateArea(width: Int, height: Int): Int {
 }
 
 fun ProcessStrings(first: String, second: String, repeatCount: Int): String {
-    let concatenated: String = first + second
+    val concatenated: String = first + second
     var result: String = ""
     var counter: Int = 0
     
@@ -228,37 +228,38 @@ interface IStringConvertible {
 }
 
 class Point implements IComparable, IStringConvertible {
-    var x: Int
-    var y: Int
+    public var x: Int
+    public var y: Int
     
-    constructor(x: Int, y: Int) {
+    public fun Point(x: Int, y: Int): Point {
         this.x = x
         this.y = y
+        return this
     }
     
-    fun GetDistance(): Float {
+    public fun GetDistance(): Float {
         return CalculateDistance(this.x, this.y)
     }
     
     private fun CalculateDistance(x: Int, y: Int): Float {
-        return Sqrt(x * x + y * y)
+        return sys::Sqrt(x * x + y * y)
     }
     
-    override fun IsLess(other: Object): Bool {
+    public override fun IsLess(other: Object): Bool {
         // Implementation of comparison logic
         return false  // Placeholder
     }
     
-    override fun ToString(): String {
+    public override fun ToString(): String {
         // Implementation of string conversion
-        return "Point(" + ToString(x) + ", " + ToString(y) + ")"
+        return "Point(" + x.ToString() + ", " + y.ToString() + ")"
     }
 }
 
 fun Main(args: StringArray): Int {
-    let point: Point = Point(3, 4)
-    let distance: Float = point.GetDistance()
-    PrintLine(ToString(distance))
+    val point: Point = Point(3, 4)
+    val distance: Float = point.GetDistance()
+    sys::PrintLine(distance.ToString())
     
     return 0
 }
@@ -428,51 +429,53 @@ interface IShape {
 }
 
 class Rectangle implements IShape {
-    var Width: Float
-    var Height: Float
+    public var Width: Float
+    public var Height: Float
     
-    constructor(width: Float, height: Float) {
+    public fun Rectangle(width: Float, height: Float): Rectangle {
         this.Width = width
         this.Height = height
+        return this
     }
     
-    fun GetArea(): Float {
+    public override fun GetArea(): Float {
         return Width * Height
     }
     
-    fun GetPerimeter(): Float {
+    public override fun GetPerimeter(): Float {
         return 2.0 * (Width + Height)
     }
 }
 
 class Circle implements IShape {
-    var Radius: Float
+    public var Radius: Float
     
-    constructor(radius: Float) {
+    public fun Circle(radius: Float): Circle {
         this.Radius = radius
+        return this
     }
     
-    fun GetArea(): Float {
+    public override fun GetArea(): Float {
         return 3.14159 * Radius * Radius
     }
     
-    fun GetPerimeter(): Float {
+    public override fun GetPerimeter(): Float {
         return 2.0 * 3.14159 * Radius
     }
 }
 
 fun ProcessShape(shape: IShape): (Float, Float) {
-    let area: Float = shape.GetArea()
-    let perimeter: Float = shape.GetPerimeter()
+    val area: Float = shape.GetArea()
+    val perimeter: Float = shape.GetPerimeter()
     return (area, perimeter)
 }
 
 fun Main(args: StringArray): Int {
-    let rectangle: Rectangle = Rectangle(5.0, 3.0)
-    let (rectArea, rectPerimeter): (Float, Float) = ProcessShape(rectangle)
+    val rectangle: Rectangle = Rectangle(5.0, 3.0)
+    val (rectArea, rectPerimeter): (Float, Float) = ProcessShape(rectangle)
     
-    let circle: Circle = Circle(2.5)
-    let (circleArea, circlePerimeter): (Float, Float) = ProcessShape(circle)
+    val circle: Circle = Circle(2.5)
+    val (circleArea, circlePerimeter): (Float, Float) = ProcessShape(circle)
     
     return 0
 }
@@ -557,20 +560,20 @@ pure fun CalculateQuadratic(a: Int, b: Int, c: Int): Int {
 }
 
 pure fun BitwiseOperations(first: Int, second: Int): Int {
-    let andResult: Int = first & second
-    let orResult: Int = first | second
-    let xorResult: Int = first ^ second
+    val andResult: Int = first & second
+    val orResult: Int = first | second
+    val xorResult: Int = first ^ second
     
     // Return XOR result (most interesting)
     return xorResult
 }
 
 fun Main(args: StringArray): Int {
-    let discriminant: Int = CalculateQuadratic(2, 5, 3)
-    PrintLine(ToString(discriminant))
+    val discriminant: Int = CalculateQuadratic(2, 5, 3)
+    sys::PrintLine(discriminant.ToString())
     
-    let xorResult: Int = BitwiseOperations(15, 7)
-    PrintLine(ToString(xorResult))
+    val xorResult: Int = BitwiseOperations(15, 7)
+    sys::PrintLine(xorResult.ToString())
     
     return 0
 }
