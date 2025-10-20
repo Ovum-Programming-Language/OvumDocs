@@ -50,6 +50,7 @@ All commands expect arguments of proper size on the stack and push return value 
 * `FloatMultiply` - Multiplies two floats (a * b)
 * `FloatDivide` - Divides two floats (a / b)
 * `FloatNegate` - Negates a float (-a)
+* `FloatSqrt` - Computes square root (sqrt(a)). NaN if negative.
 
 ## Byte Operations
 
@@ -123,15 +124,15 @@ All commands expect arguments of proper size on the stack and push return value 
 
 * `Call <function>` - Calls a function
 * `CallIndirect` - Calls function at address on stack
-* `CallVirtual <methodName>` - Calls virtual method using vtable dispatch by method name
+* `CallVirtual <methodName>` - Calls virtual method using vtable dispatch by method name.
 * `Return` - Returns from current function
-* `ReturnValue` - Returns value from top of stack
 
 ## Object Operations
 
 * `GetField <name>` - Gets object field (object on stack)
 * `SetField <name>` - Sets object field (object, value on stack)
 * `CallConstructor <class>` - Calls object constructor (arguments on stack)
+* `Unwrap <class>` - Unwraps value from primitive to fundamental
 * `GetVTable <class>` - Gets vtable for specified class
 * `SetVTable <class>` - Sets vtable for object instance
 * `IsNull` - Tests if top of stack is null
@@ -141,7 +142,7 @@ All commands expect arguments of proper size on the stack and push return value 
 
 * `SafeCall <method>` - Safe method call on nullable object
 * `NullCoalesce` - Null coalescing operator (a ?? b)
-* `Unwrap` - Unwraps nullable value (unsafe)
+* `Unwrap` - Unwraps nullable value
 
 ## System Library Commands
 

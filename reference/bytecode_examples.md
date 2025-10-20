@@ -9,21 +9,21 @@ This documents contains example bytecode programs that demonstrate the compilati
 // Simple program that prints numbers 1 to 5
 function _Global_Main_StringArray {
     PushInt 1
-    SetLocal 0
+    SetLocal 1
     
     while {
-        LoadLocal 0
+        LoadLocal 1
         PushInt 5
         IntLessEqual
     } then {
-        LoadLocal 0
-        Call _Global_ToString_Int
-        Call _Global_PrintLine_String
-        
-        LoadLocal 0
+        LoadLocal 1
+        CallConstructor Int
+        Call _Int_ToString_<C>
+        PrintLine
+        LoadLocal 1
         PushInt 1
         IntAdd
-        SetLocal 0
+        SetLocal 1
     }
     
     PushInt 0
@@ -34,10 +34,10 @@ function _Global_Main_StringArray {
 **Ovum Source Code:**
 ```ovum
 fun Main(args: StringArray): Int {
-    var i: Int = 1
+    var i: int = 1
     
-    while i <= 5 {
-        sys::PrintLine(ToString(i))
+    while (i <= 5) {
+        sys::PrintLine(Int(i).ToString())
         i = i + 1
     }
     
@@ -104,9 +104,9 @@ fun CalculateArea(width: Int, height: Int): Int {
 fun ProcessStrings(first: String, second: String, repeatCount: Int): String {
     val concatenated: String = first + second
     var result: String = ""
-    var counter: Int = 0
+    var counter: int = 0
     
-    while counter < repeatCount {
+    while (counter < repeatCount) {
         result = result + concatenated
         counter = counter + 1
     }
@@ -115,58 +115,45 @@ fun ProcessStrings(first: String, second: String, repeatCount: Int): String {
 }
 ```
 
-## Class Declarations and Method Definitions
+## VTable Declarations and Method Definitions
 
 **OIL Bytecode Target:**
 ```oil
-// Class declaration with size and vtable information
-class Point {
-    // Class metadata
-    size: 24 bytes  // 8 bytes (vtable pointer) + 2 * int (8 bytes each)
-    vtable: PointVTable
-    
-    // Field layout (offsets start after vtable pointer)
-    field "x": int (offset 8)
-    field "y": int (offset 16)
-}
-
 // VTable definition for Point class
-vtable PointVTable {
-    interface IComparable {
-        IsLess: _Point_IsLess_<C>_Object
-    }
-    interface IStringConvertible {
-        ToString: _Point_ToString_<C>
+vtable Point {
+    size: 24 // 4 bytes (vtable index) + 4 bytes (badge) + 2 * int (8 bytes each)
+    interfaces {
+        IComparable, IStringConvertible
     }
     methods {
-        GetDistance: _Point_GetDistance_<C>
-        CalculateDistance: _Point_CalculateDistance_<C>_int_int
+        _IsLess_<C>_Object: _Point_IsLess_<C>_Object
+        _ToString_<C>: _Point_ToString_<C>
     }
     vartable {
-        "x": 8
-        "y": 16
+        x: Copy:8@8
+        y: Copy:8@16
     }
 }
 
 // Constructor implementation
-function _Point_Constructor_<M>_int_int {
-    LoadLocal 0  // this pointer
+function _Point_int_int {
+    LoadLocal 0  // this pointer: put on stack by VM for constructor
     LoadLocal 1  // x argument
-    SetField "x"
-    
+    SetField x
     LoadLocal 0  // this pointer
     LoadLocal 2  // y argument
-    SetField "y"
+    SetField y
     Return
 }
 
 // Method: GetDistance
 function _Point_GetDistance_<C> {
     LoadLocal 0  // this pointer
-    GetField "x"
+    GetField x
     LoadLocal 0  // this pointer
-    GetField "y"
+    GetField y
     Call _Point_CalculateDistance_<C>_int_int
+    CallConstructor Float
     Return
 }
 
@@ -179,22 +166,59 @@ function _Point_CalculateDistance_<C>_int_int {
     LoadLocal 1  // y
     IntMultiply
     IntAdd
-    Call _Global_Sqrt_float
+    CallConstructor float
+    FloatSqrt
     Return
 }
 
 // Interface method: IsLess (IComparable)
 function _Point_IsLess_<C>_Object {
     LoadLocal 0  // this pointer
-    LoadLocal 1  // other object
-    // Implementation of comparison logic
+    if {
+        LoadLocal 1  // other object
+        IsType Point
+        BoolNot
+    } then {
+        PushBool false
+        Return
+    }
+    if {
+        LoadLocal 0
+        GetField x
+        LoadLocal 1
+        GetField x
+        IntNotEqual
+    } then {
+        LoadLocal 0
+        GetField x
+        LoadLocal 1
+        GetField x
+        IntLess
+        Return
+    }
+    LoadLocal 0
+    GetField y
+    LoadLocal 1
+    GetField y
+    IntLess
     Return
 }
 
 // Interface method: ToString (IStringConvertible)
 function _Point_ToString_<C> {
-    LoadLocal 0  // this pointer
-    // Implementation of string conversion
+    PushString "Point("
+    LoadLocal 0
+    GetField x
+    IntToString
+    StringConcat
+    PushString ", "
+    StringConcat
+    LoadLocal 0
+    GetField y
+    IntToString
+    StringConcat
+    PushString ")"
+    StringConcat
     Return
 }
 
@@ -205,12 +229,9 @@ function _Global_Main_StringArray {
     PushInt 4
     CallConstructor Point
     
-    // Call method on object
-    Dup
-    CallVirtual GetDistance  // GetDistance method by name
-    
-    Call _Global_ToString_float
-    Call _Global_PrintLine_String
+    Call _Point_GetDistance_<C> // Cll regular methods
+    Call _Float_ToString_<C>
+    PrintLine
     
     PushInt 0
     Return
@@ -228,10 +249,10 @@ interface IStringConvertible {
 }
 
 class Point implements IComparable, IStringConvertible {
-    public var x: Int
-    public var y: Int
+    public var x: int
+    public var y: int
     
-    public fun Point(x: Int, y: Int): Point {
+    public fun Point(x: int, y: int): Point {
         this.x = x
         this.y = y
         return this
@@ -241,18 +262,26 @@ class Point implements IComparable, IStringConvertible {
         return CalculateDistance(this.x, this.y)
     }
     
-    private fun CalculateDistance(x: Int, y: Int): Float {
-        return sys::Sqrt(x * x + y * y)
+    private fun CalculateDistance(x: int, y: int): float {
+        return sys::Sqrt(float(x * x + y * y))
     }
     
     public override fun IsLess(other: Object): Bool {
-        // Implementation of comparison logic
-        return false  // Placeholder
+        if (!(other is Point)) {
+            return false
+        }
+        
+        val otherPoint: Point = (other as Point) ?: Point(0, 0)
+        
+        if (this.x != otherPoint.x) {
+            return this.x < otherPoint.x
+        }
+        
+        return this.y < otherPoint.y
     }
     
     public override fun ToString(): String {
-        // Implementation of string conversion
-        return "Point(" + x.ToString() + ", " + y.ToString() + ")"
+        return "Point(" + Int(x).ToString() + ", " + Int(y).ToString() + ")"
     }
 }
 
@@ -260,6 +289,7 @@ fun Main(args: StringArray): Int {
     val point: Point = Point(3, 4)
     val distance: Float = point.GetDistance()
     sys::PrintLine(distance.ToString())
+    sys::PrintLine(point.ToString())
     
     return 0
 }
@@ -269,133 +299,132 @@ fun Main(args: StringArray): Int {
 
 **OIL Bytecode Target:**
 ```oil
-// Interface definition
-interface IShape {
-    fun GetArea(): Float
-    fun GetPerimeter(): Float
-}
-
-// Rectangle class declaration
-class Rectangle {
-    // Class metadata
-    size: 24 bytes  // 8 bytes (vtable pointer) + 2 * Float (8 bytes each)
-    vtable: RectangleVTable
-    
-    // Field layout (offsets start after vtable pointer)
-    field "Width": Float (offset 8)
-    field "Height": Float (offset 16)
-}
-
 // Rectangle VTable definition
-vtable RectangleVTable {
-    interface IShape {
-        GetArea: _Rectangle_GetArea_<C>
-        GetPerimeter: _Rectangle_GetPerimeter_<C>
+vtable Rectangle {
+    size: 24 // 4 bytes (vtable index) + 4 bytes (badge) + 2 * Ref (8 bytes each)
+    interfaces {
+        IShape
+    }
+    methods {
+        _Rectangle_GetArea_<C>: _Rectangle_GetArea_<C>
+        _Rectangle_GetPerimeter_<C>: _Rectangle_GetPerimeter_<C>
     }
     vartable {
-        "Width": 8
-        "Height": 16
+        Width: Ref@8
+        Height: Ref@16
     }
-}
-
-// Circle class declaration
-class Circle {
-    // Class metadata
-    size: 16 bytes  // 8 bytes (vtable pointer) + 1 * Float (8 bytes)
-    vtable: CircleVTable
-    
-    // Field layout (offsets start after vtable pointer)
-    field "Radius": Float (offset 8)
 }
 
 // Circle VTable definition
-vtable CircleVTable {
-    interface IShape {
-        GetArea: _Circle_GetArea_<C>
-        GetPerimeter: _Circle_GetPerimeter_<C>
+vtable Circle {
+    size: 16 // 4 bytes (vtable index) + 4 bytes (badge) + 1 * Ref (8 bytes)
+    interfaces {
+        IShape
+    }
+    methods {
+        _Circle_GetArea_<C>: _Circle_GetArea_<C>
+        _Circle_GetPerimeter_<C>: _Circle_GetPerimeter_<C>
     }
     vartable {
-        "Radius": 8
+        Radius: Ref@8
     }
 }
 
 // Rectangle constructor implementation
-function _Rectangle_Constructor_<M>_Float_Float {
+function _Rectangle_float_float {
     LoadLocal 0  // this pointer
     LoadLocal 1  // width argument
-    SetField "Width"
-    
+    CallConstructor Float
+    SetField Width
     LoadLocal 0  // this pointer
     LoadLocal 2  // height argument
-    SetField "Height"
+    CallConstructor Float
+    SetField Height
     Return
 }
 
 // Rectangle interface method: GetArea
 function _Rectangle_GetArea_<C> {
     LoadLocal 0  // this pointer
-    GetField "Width"
+    GetField Width
+    Unwrap float
     LoadLocal 0  // this pointer
-    GetField "Height"
+    GetField Height
+    Unwrap float
     FloatMultiply
+    CallConstructor Float
     Return
 }
 
 // Rectangle interface method: GetPerimeter
 function _Rectangle_GetPerimeter_<C> {
     LoadLocal 0  // this pointer
-    GetField "Width"
+    GetField Width
+    Unwrap float
     LoadLocal 0  // this pointer
-    GetField "Height"
+    GetField Height
+    Unwrap float
     FloatAdd
     PushFloat 2.0
     FloatMultiply
+    CallConstructor Float
     Return
 }
 
 // Circle constructor implementation
-function _Circle_Constructor_<M>_Float {
+function _Circle_Constructor_<M>_float {
     LoadLocal 0  // this pointer
     LoadLocal 1  // radius argument
-    SetField "Radius"
+    CallConstructor Float
+    SetField Radius
     Return
 }
 
 // Circle interface method: GetArea
 function _Circle_GetArea_<C> {
     LoadLocal 0  // this pointer
-    GetField "Radius"
+    GetField Radius
+    Unwrap float
     LoadLocal 0  // this pointer
-    GetField "Radius"
+    GetField Radius
+    Unwrap float
     FloatMultiply
     PushFloat 3.14159
     FloatMultiply
+    CallConstructor Float
     Return
 }
 
 // Circle interface method: GetPerimeter
 function _Circle_GetPerimeter_<C> {
     LoadLocal 0  // this pointer
-    GetField "Radius"
+    GetField Radius
+    Unwrap float
     PushFloat 2.0
     FloatMultiply
     PushFloat 3.14159
     FloatMultiply
+    CallConstructor Float
     Return
 }
 
 // Polymorphic usage through interface
 function _Global_ProcessShape_IShape {
     LoadLocal 0  // IShape object
-    
-    // Call interface method GetArea
-    Dup
-    CallVirtual GetArea  // GetArea method by name
-    
-    // Call interface method GetPerimeter
-    Dup
-    CallVirtual GetPerimeter  // GetPerimeter method by name
-    
+    CallVirtual _GetArea_<C>  // GetArea method by name
+    SetLocal 1
+    LoadLocal 0
+    CallVirtual _GetPerimeter_<C>  // GetPerimeter method by name
+    SetLocal 2
+    PushString "Area: "
+    LoadLocal 1
+    Call _Float_ToString_<C>
+    StringConcat
+    PushString ", Perimeter: "
+    StringConcat
+    LoadLocal 2
+    Call _Float_ToString_<C>
+    StringConcat
     Return
 }
 
@@ -405,17 +434,21 @@ function _Global_Main_StringArray {
     PushFloat 5.0
     PushFloat 3.0
     CallConstructor Rectangle
-    
-    // Process as IShape (interface-based polymorphism)
-    Call _Global_ProcessShape_IShape
-    
+    SetLocal 1
     // Create Circle object
     PushFloat 2.5
     CallConstructor Circle
-    
-    // Process as IShape (interface-based polymorphism)
+    SetLocal 2
+    LoadLocal 1
     Call _Global_ProcessShape_IShape
-    
+    SetLocal 3
+    LoadLocal 2
+    Call _Global_ProcessShape_IShape
+    SetLocal 4
+    LoadLocal 3
+    PrintLine
+    LoadLocal 4
+    PrintLine
     PushInt 0
     Return
 }
@@ -432,7 +465,7 @@ class Rectangle implements IShape {
     public var Width: Float
     public var Height: Float
     
-    public fun Rectangle(width: Float, height: Float): Rectangle {
+    public fun Rectangle(width: float, height: float): Rectangle {
         this.Width = width
         this.Height = height
         return this
@@ -450,7 +483,7 @@ class Rectangle implements IShape {
 class Circle implements IShape {
     public var Radius: Float
     
-    public fun Circle(radius: Float): Circle {
+    public fun Circle(radius: float): Circle {
         this.Radius = radius
         return this
     }
@@ -464,18 +497,19 @@ class Circle implements IShape {
     }
 }
 
-fun ProcessShape(shape: IShape): (Float, Float) {
+fun ProcessShape(shape: IShape): String {
     val area: Float = shape.GetArea()
     val perimeter: Float = shape.GetPerimeter()
-    return (area, perimeter)
+    return "Area: " + area.ToString() + ", Perimeter: " + perimeter.ToString()
 }
 
 fun Main(args: StringArray): Int {
     val rectangle: Rectangle = Rectangle(5.0, 3.0)
-    val (rectArea, rectPerimeter): (Float, Float) = ProcessShape(rectangle)
-    
     val circle: Circle = Circle(2.5)
-    val (circleArea, circlePerimeter): (Float, Float) = ProcessShape(circle)
+    val result_rectangle: String = ProcessShape(rectangle)
+    val result_circle: String = ProcessShape(circle)
+    sys::PrintLine(result_rectangle)
+    sys::PrintLine(result_circle)
     
     return 0
 }
@@ -487,7 +521,7 @@ fun Main(args: StringArray): Int {
 ```oil
 // Pure function that calculates mathematical operations without heap allocation
 // Arguments: Copy:8 (int), Copy:8 (int), Copy:8 (int)
-pure(Copy:8, Copy:8, Copy:8) function _Pure_CalculateQuadratic_int_int_int {
+pure(Copy:8, Copy:8, Copy:8) function _Global_CalculateQuadratic_int_int_int {
     LoadLocal 0  // a (copy)
     LoadLocal 1  // b (copy)
     LoadLocal 2  // c (copy)
@@ -509,7 +543,7 @@ pure(Copy:8, Copy:8, Copy:8) function _Pure_CalculateQuadratic_int_int_int {
 
 // Pure function that performs bitwise operations
 // Arguments: Copy:8 (int), Copy:8 (int)
-pure(Copy:8, Copy:8) function _Pure_BitwiseOperations_int_int {
+pure(Copy:8, Copy:8) function _Global_BitwiseOperations_int_int {
     LoadLocal 0  // first number (copy)
     LoadLocal 1  // second number (copy)
     
@@ -537,15 +571,19 @@ function _Global_Main_StringArray {
     PushInt 2
     PushInt 5
     PushInt 3
-    Call _Pure_CalculateQuadratic_int_int_int
-    Call _Global_ToString_int
-    Call _Global_PrintLine_String
+    Call _Global_CalculateQuadratic_int_int_int
+    SetLocal 1 // this line and line below can possibly be optimized out by the compiler
+    LoadLocal 1
+    IntToString
+    PrintLine
     
     PushInt 15
     PushInt 7
-    Call _Pure_BitwiseOperations_int_int
-    Call _Global_ToString_int
-    Call _Global_PrintLine_String
+    Call _Global_BitwiseOperations_int_int
+    SetLocal 2 // this line and line below can possibly be optimized out by the compiler
+    LoadLocal 2
+    IntToString
+    PrintLine
     
     PushInt 0
     Return
@@ -554,15 +592,15 @@ function _Global_Main_StringArray {
 
 **Ovum Source Code:**
 ```ovum
-pure fun CalculateQuadratic(a: Int, b: Int, c: Int): Int {
+pure fun CalculateQuadratic(a: int, b: int, c: int): int {
     // Calculate discriminant: b^2 - 4ac
     return b * b - 4 * a * c
 }
 
-pure fun BitwiseOperations(first: Int, second: Int): Int {
-    val andResult: Int = first & second
-    val orResult: Int = first | second
-    val xorResult: Int = first ^ second
+pure fun BitwiseOperations(first: int, second: int): int {
+    val andResult: int = first & second
+    val orResult: int = first | second
+    val xorResult: int = first ^ second
     
     // Return XOR result (most interesting)
     return xorResult
@@ -570,10 +608,10 @@ pure fun BitwiseOperations(first: Int, second: Int): Int {
 
 fun Main(args: StringArray): Int {
     val discriminant: Int = CalculateQuadratic(2, 5, 3)
-    sys::PrintLine(discriminant.ToString())
+    sys::PrintLine(ToString(discriminant))
     
     val xorResult: Int = BitwiseOperations(15, 7)
-    sys::PrintLine(xorResult.ToString())
+    sys::PrintLine(ToString(xorResult))
     
     return 0
 }

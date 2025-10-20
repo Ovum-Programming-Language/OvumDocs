@@ -21,9 +21,8 @@ If statements consist of separate condition blocks and execution blocks connecte
         IntGreaterThan
     } then {
         PushString "Positive number"
-        Call Print
+        Print
     }
-    
     // Optional else if branches
     else if {
         LoadLocal 0
@@ -31,13 +30,12 @@ If statements consist of separate condition blocks and execution blocks connecte
         IntLessThan
     } then {
         PushString "Negative number"
-        Call Print
+        Print
     }
-    
     // Default else block
     else {
         PushString "Zero"
-        Call Print
+        Print
     }
 }
 ```
@@ -51,7 +49,6 @@ While loops consist of separate condition blocks and execution blocks connected 
     // Initialize loop variable
     PushInt 0
     SetLocal 0
-    
     // While loop
     while {
         LoadLocal 0
@@ -60,9 +57,8 @@ While loops consist of separate condition blocks and execution blocks connected 
     } then {
         // Execution block
         LoadLocal 0
-        Call ToString
-        Call Print
-        
+        IntToString
+        Print
         // Increment loop variable
         LoadLocal 0
         PushInt 1
@@ -78,7 +74,7 @@ Functions are defined with optional keywords and contain a sequence of bytecode 
 
 ```oil
 // Basic function
-function CalculateSum {
+function _Global_CalculateSum_int_int {
     LoadLocal 0
     LoadLocal 1
     IntAdd
@@ -86,8 +82,8 @@ function CalculateSum {
 }
 
 // Pure function with argument descriptions
-// Arguments: Copy:8 (Int), Copy:8 (Int)
-pure(Copy:8, Copy:8) function IsEven {
+// Arguments: Copy:8 (int), Copy:8 (int)
+pure(Copy:8, Copy:8) function _Global_IsEven_int_int {
     LoadLocal 0
     PushInt 2
     IntModulo
@@ -97,76 +93,67 @@ pure(Copy:8, Copy:8) function IsEven {
 }
 
 // Pure function with mixed argument types
-// Arguments: Ref (String), Copy:8 (Int)
-pure(Ref, Copy:8) function StringRepeat {
+// Arguments: Ref (String), Copy:8 (int)
+pure(Ref, Copy:8) function _Global_StringRepeat_String_int {
     LoadLocal 0  // String reference
     LoadLocal 1  // Int copy
-    Call StringRepeatImpl
+    Call _Global_StringRepeatImpl_String_int
     Return
 }
 
 // Function with no JIT optimization
-no-jit function DebugPrint {
+no-jit function _Global_DebugPrint_Object {
     LoadLocal 0
-    Call ToString
-    Call Print
+    CallVirtual _ToString_<C>
+    PrintLine
     Return
 }
 
 // Main function (entry point)
-function Main {
+function _Global_Main_StringArray {
     PushString "Hello, World!"
-    Call Print
+    PrintLine
     PushInt 0
     Return
 }
 ```
 
-## Class Declarations and VTable Structure
+## VTable Structure
 
-### Class Declaration Syntax
-
-Class declarations in Ovum bytecode specify the class metadata, size, and vtable information separately from method implementations:
-
-```oil
-class ClassName {
-    // Class metadata
-    size: <size> bytes  // Includes vtable pointer (8 bytes) + field sizes
-    vtable: <VTableName>
-    
-    // Field layout (offsets start after vtable pointer)
-    field "<fieldName>": <type> (offset <offset>)
-    field "<fieldName>": <type> (offset <offset>)
-    ...
-}
-```
+VTable is a data structure that maps method names to their implementations. 
+It is used to resolve method calls at runtime. 
+VTable is stored in the object itself and is accessed by the object's vtable index.
+VTable is also used to resolve field access at runtime.
 
 ### VTable Definition Syntax
 
-VTable definitions map interface methods, class methods, and field information to their implementations:
+VTable definitions map interface methods and field information to their implementations and contains class size information in bytes:
 
 ```oil
-vtable <VTableName> {
-    interface <InterfaceName> {
-        <methodName>: <mangledFunctionName>
-        <methodName>: <mangledFunctionName>
+vtable <ClassName> {
+    size: <size>  // Includes vtable index (4 bytes) + badge (4 bytes) + field sizes in bytes
+    interfaces {
+        <InterfaceName>,<InterfaceName>, ...
     }
     methods {
-        <methodName>: <mangledFunctionName>
-        <methodName>: <mangledFunctionName>
+        <methodNameWithoutClassName>: <realFunctionName>
+        <methodNameWithoutClassName>: <realFunctionName>
+        ...
     }
     vartable {
-        "<fieldName>": <offset>
-        "<fieldName>": <offset>
+        <fieldName>: <Ref|Copy:<size>>@<offset>
+        <fieldName>: <Ref|Copy:<size>>@<offset>
+        ...
     }
 }
 ```
 
 ### Field Layout and Memory Management
 
-* **VTable pointer**: Each object starts with an 8-byte pointer to its vtable (offset 0)
-* **Field offsets**: Each field has a specific byte offset within the object (starting after vtable pointer)
-* **Size calculation**: Total class size = 8 bytes (vtable pointer) + sum of all field sizes + alignment
+* **VTable index**: Each object starts with an 4-byte index to its vtable (offset 0)
+* **Service information (badge)**: Each object contains 4-byte field for service information called badge (e.g. GC generation, reference count, etc.). Starts after vtable index.
+* **Field offsets**: Each field has a specific byte offset within the object (starting after vtable index and badge)
+* **Size calculation**: Total class size = 4 bytes (vtable index) + 4 bytes (badge) + sum of all field sizes + alignment
 * **Memory alignment**: Fields are aligned according to their type size
 * **Vartable**: Maps field names to their byte offsets for runtime field access
 
@@ -179,22 +166,20 @@ Function names are mangled to include fully qualified class names for method res
 * **Global functions**: `_Global_<functionName>_<arg1Type>_<arg2Type>_..._<argNType>`
 * **Class methods**: `_<ClassName>_<methodName>_<constFlag>_<arg1Type>_<arg2Type>_..._<argNType>`
 * **Nested classes**: `_<OuterClass>_<InnerClass>_<methodName>_<constFlag>_<arg1Type>_<arg2Type>_..._<argNType>`
-* **Pure functions**: `_Pure_<functionName>_<arg1Type>_<arg2Type>_..._<argNType>` or `_Pure_<ClassName>_<methodName>_<constFlag>_<arg1Type>_<arg2Type>_..._<argNType>`
 
 **Argument mutability indicators:**
 * `<M>` - Mutable argument (`var` parameter)
 * `<C>` - Const argument (default, immutable parameter)
 
 **Const method flag:**
+* `<M>` - Mutable method (can modify object state)
 * `<C>` - Const method (cannot modify object state)
-* `<M>` - Mutable method (default, can modify object state)
 
 ### Examples
 
 ```oil
 // Source code
 fun Foo(a: Int, b: bool, var s: String): String { ... }
-fun Bar(a: Int, b: bool, var s: String): String { ... }  // const method
 
 class MathUtils implements IComparable {
     fun Add(a: Int, b: Int): Int { ... }
@@ -207,9 +192,8 @@ fun Main(args: StringArray): Int { ... }
 
 // Mangled names
 _Global_Foo_Int_bool_<M>String
-_Global_Bar_<C>_Int_bool_<M>String
 _MathUtils_Add_<M>_Int_Int
-_Pure_MathUtils_IsEven_<C>_int
+_MathUtils_IsEven_<C>_int
 _MathUtils_IncrementCounter_<M>
 _MathUtils_IsLess_<C>_Object
 _Global_Main_StringArray
