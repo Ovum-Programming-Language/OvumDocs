@@ -1,7 +1,10 @@
 # Example Bytecode Programs
 
+This documents contains example bytecode programs that demonstrate the compilation of Ovum source code to OIL bytecode.
+
 ## Simple Program
 
+**OIL Bytecode Target:**
 ```oil
 // Simple program that prints numbers 1 to 5
 function _Global_Main_StringArray {
@@ -9,24 +12,18 @@ function _Global_Main_StringArray {
     SetLocal 0
     
     while {
-        // Condition block
-        {
-            LoadLocal 0
-            PushInt 5
-            IntLessEqual
-        }
+        LoadLocal 0
+        PushInt 5
+        IntLessEqual
+    } then {
+        LoadLocal 0
+        Call _Global_ToString_Int
+        Call _Global_PrintLine_String
         
-        // Execution block
-        {
-            LoadLocal 0
-            Call _Global_ToString_Int
-            Call _Global_PrintLine_String
-            
-            LoadLocal 0
-            PushInt 1
-            IntAdd
-            SetLocal 0
-        }
+        LoadLocal 0
+        PushInt 1
+        IntAdd
+        SetLocal 0
     }
     
     PushInt 0
@@ -34,8 +31,23 @@ function _Global_Main_StringArray {
 }
 ```
 
+**Ovum Source Code:**
+```ovum
+fun Main(args: StringArray): Int {
+    var i: Int = 1
+    
+    while i <= 5 {
+        PrintLine(ToString(i))
+        i = i + 1
+    }
+    
+    return 0
+}
+```
+
 ## Function with Multiple Arguments
 
+**OIL Bytecode Target:**
 ```oil
 // Function that calculates area of rectangle
 // Arguments: Copy:8 (int), Copy:8 (int)
@@ -63,25 +75,19 @@ function _Global_ProcessStrings_String_String_int {
     SetLocal 5  // counter
     
     while {
-        // Condition block
-        {
-            LoadLocal 5
-            LoadLocal 2
-            IntLessThan
-        }
+        LoadLocal 5
+        LoadLocal 2
+        IntLessThan
+    } then {
+        LoadLocal 4
+        LoadLocal 3
+        StringConcat
+        SetLocal 4
         
-        // Execution block
-        {
-            LoadLocal 4
-            LoadLocal 3
-            StringConcat
-            SetLocal 4
-            
-            LoadLocal 5
-            PushInt 1
-            IntAdd
-            SetLocal 5
-        }
+        LoadLocal 5
+        PushInt 1
+        IntAdd
+        SetLocal 5
     }
     
     LoadLocal 4
@@ -89,8 +95,29 @@ function _Global_ProcessStrings_String_String_int {
 }
 ```
 
+**Ovum Source Code:**
+```ovum
+fun CalculateArea(width: Int, height: Int): Int {
+    return width * height
+}
+
+fun ProcessStrings(first: String, second: String, repeatCount: Int): String {
+    let concatenated: String = first + second
+    var result: String = ""
+    var counter: Int = 0
+    
+    while counter < repeatCount {
+        result = result + concatenated
+        counter = counter + 1
+    }
+    
+    return result
+}
+```
+
 ## Class Declarations and Method Definitions
 
+**OIL Bytecode Target:**
 ```oil
 // Class declaration with size and vtable information
 class Point {
@@ -190,8 +217,56 @@ function _Global_Main_StringArray {
 }
 ```
 
+**Ovum Source Code:**
+```ovum
+interface IComparable {
+    fun IsLess(other: Object): Bool
+}
+
+interface IStringConvertible {
+    fun ToString(): String
+}
+
+class Point implements IComparable, IStringConvertible {
+    var x: Int
+    var y: Int
+    
+    constructor(x: Int, y: Int) {
+        this.x = x
+        this.y = y
+    }
+    
+    fun GetDistance(): Float {
+        return CalculateDistance(this.x, this.y)
+    }
+    
+    private fun CalculateDistance(x: Int, y: Int): Float {
+        return Sqrt(x * x + y * y)
+    }
+    
+    override fun IsLess(other: Object): Bool {
+        // Implementation of comparison logic
+        return false  // Placeholder
+    }
+    
+    override fun ToString(): String {
+        // Implementation of string conversion
+        return "Point(" + ToString(x) + ", " + ToString(y) + ")"
+    }
+}
+
+fun Main(args: StringArray): Int {
+    let point: Point = Point(3, 4)
+    let distance: Float = point.GetDistance()
+    PrintLine(ToString(distance))
+    
+    return 0
+}
+```
+
 ## Interface-Based Polymorphism
 
+**OIL Bytecode Target:**
 ```oil
 // Interface definition
 interface IShape {
@@ -345,8 +420,67 @@ function _Global_Main_StringArray {
 }
 ```
 
+**Ovum Source Code:**
+```ovum
+interface IShape {
+    fun GetArea(): Float
+    fun GetPerimeter(): Float
+}
+
+class Rectangle implements IShape {
+    var Width: Float
+    var Height: Float
+    
+    constructor(width: Float, height: Float) {
+        this.Width = width
+        this.Height = height
+    }
+    
+    fun GetArea(): Float {
+        return Width * Height
+    }
+    
+    fun GetPerimeter(): Float {
+        return 2.0 * (Width + Height)
+    }
+}
+
+class Circle implements IShape {
+    var Radius: Float
+    
+    constructor(radius: Float) {
+        this.Radius = radius
+    }
+    
+    fun GetArea(): Float {
+        return 3.14159 * Radius * Radius
+    }
+    
+    fun GetPerimeter(): Float {
+        return 2.0 * 3.14159 * Radius
+    }
+}
+
+fun ProcessShape(shape: IShape): (Float, Float) {
+    let area: Float = shape.GetArea()
+    let perimeter: Float = shape.GetPerimeter()
+    return (area, perimeter)
+}
+
+fun Main(args: StringArray): Int {
+    let rectangle: Rectangle = Rectangle(5.0, 3.0)
+    let (rectArea, rectPerimeter): (Float, Float) = ProcessShape(rectangle)
+    
+    let circle: Circle = Circle(2.5)
+    let (circleArea, circlePerimeter): (Float, Float) = ProcessShape(circle)
+    
+    return 0
+}
+```
+
 ## Pure Functions with Mixed Argument Types
 
+**OIL Bytecode Target:**
 ```oil
 // Pure function that calculates mathematical operations without heap allocation
 // Arguments: Copy:8 (int), Copy:8 (int), Copy:8 (int)
@@ -414,3 +548,42 @@ function _Global_Main_StringArray {
     Return
 }
 ```
+
+**Ovum Source Code:**
+```ovum
+pure fun CalculateQuadratic(a: Int, b: Int, c: Int): Int {
+    // Calculate discriminant: b^2 - 4ac
+    return b * b - 4 * a * c
+}
+
+pure fun BitwiseOperations(first: Int, second: Int): Int {
+    let andResult: Int = first & second
+    let orResult: Int = first | second
+    let xorResult: Int = first ^ second
+    
+    // Return XOR result (most interesting)
+    return xorResult
+}
+
+fun Main(args: StringArray): Int {
+    let discriminant: Int = CalculateQuadratic(2, 5, 3)
+    PrintLine(ToString(discriminant))
+    
+    let xorResult: Int = BitwiseOperations(15, 7)
+    PrintLine(ToString(xorResult))
+    
+    return 0
+}
+```
+
+## Summary
+
+These examples demonstrate how Ovum source code compiles to the OIL bytecode format:
+
+1. **Simple Program**: Basic control flow with while loops and local variables
+2. **Function with Multiple Arguments**: Functions with different argument types (copy vs reference)
+3. **Class Declarations**: Object-oriented features with constructors, methods, and interfaces
+4. **Interface-Based Polymorphism**: Runtime polymorphism through interface dispatch
+5. **Pure Functions**: Functions marked as pure for optimization, with mixed argument types
+
+The compilation process transforms high-level Ovum constructs into stack-based bytecode instructions, with proper name mangling for functions and vtables for object-oriented features.

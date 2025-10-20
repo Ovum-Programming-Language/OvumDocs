@@ -1,6 +1,7 @@
 # Ovum Intermediate Language (Bytecode) Commands
 
 This document describes the commands available in the Ovum Intermediate Language (OIL).
+All commands expect arguments of proper size on the stack and push return value on stack if applicable.
 
 ## Stack Operations
 
@@ -48,8 +49,18 @@ This document describes the commands available in the Ovum Intermediate Language
 * `FloatSubtract` - Subtracts two floats (a - b)
 * `FloatMultiply` - Multiplies two floats (a * b)
 * `FloatDivide` - Divides two floats (a / b)
-* `FloatModulo` - Computes remainder (a % b)
 * `FloatNegate` - Negates a float (-a)
+
+## Byte Operations
+
+* `ByteAdd` - Adds two bytes (a + b)
+* `ByteSubtract` - Subtracts two bytes (a - b)
+* `ByteMultiply` - Multiplies two bytes (a * b)
+* `ByteDivide` - Divides two bytes (a / b)
+* `ByteModulo` - Computes remainder (a % b)
+* `ByteNegate` - Negates a byte (-a)
+* `ByteIncrement` - Increments a byte (a + 1)
+* `ByteDecrement` - Decrements a byte (a - 1)
 
 ## Comparison Operations
 
@@ -65,6 +76,12 @@ This document describes the commands available in the Ovum Intermediate Language
 * `FloatLessEqual` - Tests float less than or equal (a <= b)
 * `FloatGreaterThan` - Tests float greater than (a > b)
 * `FloatGreaterEqual` - Tests float greater than or equal (a >= b)
+* `ByteEqual` - Tests byte equality (a == b)
+* `ByteNotEqual` - Tests byte inequality (a != b)
+* `ByteLessThan` - Tests byte less than (a < b)
+* `ByteLessEqual` - Tests byte less than or equal (a <= b)
+* `ByteGreaterThan` - Tests byte greater than (a > b)
+* `ByteGreaterEqual` - Tests byte greater than or equal (a >= b)
 
 ## Logical Operations
 
@@ -81,6 +98,15 @@ This document describes the commands available in the Ovum Intermediate Language
 * `IntNot` - Bitwise NOT (~a)
 * `IntLeftShift` - Left bit shift (a << b)
 * `IntRightShift` - Right bit shift (a >> b)
+
+## Byte Bitwise Operations
+
+* `ByteAnd` - Bitwise AND (a & b)
+* `ByteOr` - Bitwise OR (a | b)
+* `ByteXor` - Bitwise XOR (a ^ b)
+* `ByteNot` - Bitwise NOT (~a)
+* `ByteLeftShift` - Left bit shift (a << b)
+* `ByteRightShift` - Right bit shift (a >> b)
 
 ## String Operations
 
@@ -138,6 +164,7 @@ This document describes the commands available in the Ovum Intermediate Language
 ## File Operations
 
 * `OpenFile` - Opens file with specified mode
+* `CloseFile` - Closes file
 * `FileExists` - Checks if file exists
 * `DirectoryExists` - Checks if directory exists
 * `CreateDirectory` - Creates directory
@@ -151,7 +178,7 @@ This document describes the commands available in the Ovum Intermediate Language
 
 ## Process Control
 
-* `Sleep` - Sleeps for specified milliseconds
+* `SleepMs` - Sleeps for specified milliseconds
 * `SleepNs` - Sleeps for specified nanoseconds
 * `Exit` - Terminates process with exit code
 * `GetProcessId` - Gets current process ID
@@ -190,17 +217,8 @@ This document describes the commands available in the Ovum Intermediate Language
 
 * `Interope` - Calls external function via FFI (unsafe)
 
-## Memory Management
-
-* `Allocate <size>` - Allocates memory block
-* `Deallocate` - Deallocates memory block (unsafe)
-* `Reallocate <size>` - Reallocates memory block (unsafe)
-* `MemoryCopy` - Copies memory between blocks (unsafe)
-* `MemorySet` - Sets memory block to value (unsafe)
-
 ## Type Operations
 
 * `TypeOf` - Gets type of value on stack
 * `IsType <type>` - Tests if value is of specific type
-* `Cast <type>` - Casts value to specific type
 * `SizeOf <type>` - Gets size of type in bytes

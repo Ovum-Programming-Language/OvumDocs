@@ -10,37 +10,28 @@ Ovum bytecode follows a stack-based execution model where operations consume val
 
 #### If Statements
 
-If statements consist of separate condition blocks and execution blocks. The syntax supports `if`, `else if`, and `else` branches:
+If statements consist of separate condition blocks and execution blocks connected by the `then` keyword. The syntax supports `if`, `else if`, and `else` branches:
 
 ```oil
 {
-    // Condition block - pushes Bool value to stack
-    {
+    // If condition is true, execute this block
+    if {
         LoadLocal 0
         PushInt 0
         IntGreaterThan
-    }
-    
-    // If condition is true, execute this block
-    if {
+    } then {
         PushString "Positive number"
         Call Print
     }
     
     // Optional else if branches
     else if {
-        // Condition block for else if
-        {
-            LoadLocal 0
-            PushInt 0
-            IntLessThan
-        }
-        
-        // Execution block for else if
-        if {
-            PushString "Negative number"
-            Call Print
-        }
+        LoadLocal 0
+        PushInt 0
+        IntLessThan
+    } then {
+        PushString "Negative number"
+        Call Print
     }
     
     // Default else block
@@ -53,7 +44,7 @@ If statements consist of separate condition blocks and execution blocks. The syn
 
 #### While Loops
 
-While loops consist of separate condition blocks and execution blocks. For loops are reduced to while loops during compilation:
+While loops consist of separate condition blocks and execution blocks connected by the `then` keyword. For loops are reduced to while loops during compilation:
 
 ```oil
 {
@@ -63,25 +54,20 @@ While loops consist of separate condition blocks and execution blocks. For loops
     
     // While loop
     while {
-        // Condition block - pushes Bool value to stack
-        {
-            LoadLocal 0
-            PushInt 10
-            IntLessThan
-        }
-        
+        LoadLocal 0
+        PushInt 10
+        IntLessThan
+    } then {
         // Execution block
-        {
-            LoadLocal 0
-            Call ToString
-            Call Print
-            
-            // Increment loop variable
-            LoadLocal 0
-            PushInt 1
-            IntAdd
-            SetLocal 0
-        }
+        LoadLocal 0
+        Call ToString
+        Call Print
+        
+        // Increment loop variable
+        LoadLocal 0
+        PushInt 1
+        IntAdd
+        SetLocal 0
     }
 }
 ```
