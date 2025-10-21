@@ -228,9 +228,13 @@ function _Global_Main_StringArray {
     PushInt 3
     PushInt 4
     CallConstructor Point
-    
-    Call _Point_GetDistance_<C> // Cll regular methods
+    SetLocal 0
+    LoadLocal 0
+    Call _Point_GetDistance_<C> // Call regular methods
     Call _Float_ToString_<C>
+    PrintLine
+    LoadLocal 0
+    Call Point_ToString_<C>
     PrintLine
     
     PushInt 0

@@ -23,7 +23,7 @@ Ovum reserves certain words like `fun`, `class`, `interface`, `var`, `override`,
 
 * **Arithmetic**: `+`, `-`, `*`, `/`, `%`
 * **Comparison**: `==`, `!=`, `<`, `<=`, `>`, `>=`
-* **Boolean logic**: `&&` (logical AND), `||` (logical OR), `!` (negation), `xor` (exclusive OR)
+* **Boolean logic**: `&&` (logical AND), `||` (logical OR), `!` (negation), `^` (exclusive OR)
 * **Assignment**: `=` (reference assignment), `:=` (copy assignment)
 * **Null handling**: `?.` (safe call), `?:` (Elvis)
 * **Type operations**: `as` (cast), `is` (type test)
@@ -116,7 +116,7 @@ ElvisExpr       ::= OrExpr [ "?:" ElvisExpr ] ;  // right-assoc
 
 OrExpr          ::= AndExpr { "||" AndExpr } ;
 AndExpr         ::= XorExpr { "&&" XorExpr } ;
-XorExpr         ::= EqualityExpr { "xor" EqualityExpr } ;
+XorExpr         ::= EqualityExpr { "^" EqualityExpr } ;
 
 EqualityExpr    ::= RelExpr { ("==" | "!=") RelExpr } ;
 RelExpr         ::= AddExpr { ("<" | "<=" | ">" | ">=") AddExpr } ;
