@@ -2,6 +2,8 @@
 
 The Ovum Intermediate Language (Ovum bytecode) is a stack-based virtual machine instruction set that serves as the compilation target for Ovum source code. This document describes the bytecode syntax, structure, and available commands.
 
+See also: [bytecode command list](./bytecode_commands.md) and [bytecode examples](./bytecode_examples.md).
+
 ## General Syntax
 
 Ovum bytecode follows a stack-based execution model where operations consume values from the stack and push results back onto the stack. The syntax uses WASM-like code blocks enclosed in curly braces `{}`.
