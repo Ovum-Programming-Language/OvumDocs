@@ -76,7 +76,7 @@ Functions are defined with optional keywords and contain a sequence of bytecode 
 
 ```oil
 // Basic function
-function _Global_CalculateSum_int_int {
+function:2 _Global_CalculateSum_int_int {
     LoadLocal 0
     LoadLocal 1
     IntAdd
@@ -84,8 +84,8 @@ function _Global_CalculateSum_int_int {
 }
 
 // Pure function with argument descriptions
-// Arguments: Copy:8 (int), Copy:8 (int)
-pure(Copy:8, Copy:8) function _Global_IsEven_int_int {
+// Arguments: int (int), int (int)
+pure(int, int) function:2 _Global_IsEven_int_int {
     LoadLocal 0
     PushInt 2
     IntModulo
@@ -95,8 +95,8 @@ pure(Copy:8, Copy:8) function _Global_IsEven_int_int {
 }
 
 // Pure function with mixed argument types
-// Arguments: Ref (String), Copy:8 (int)
-pure(Ref, Copy:8) function _Global_StringRepeat_String_int {
+// Arguments: Obj (String), int (int)
+pure(Obj, int) function:2 _Global_StringRepeat_String_int {
     LoadLocal 0  // String reference
     LoadLocal 1  // Int copy
     Call _Global_StringRepeatImpl_String_int
@@ -104,7 +104,7 @@ pure(Ref, Copy:8) function _Global_StringRepeat_String_int {
 }
 
 // Function with no JIT optimization
-no-jit function _Global_DebugPrint_Object {
+no-jit function:1 _Global_DebugPrint_Object {
     LoadLocal 0
     CallVirtual _ToString_<C>
     PrintLine
@@ -112,7 +112,7 @@ no-jit function _Global_DebugPrint_Object {
 }
 
 // Main function (entry point)
-function _Global_Main_StringArray {
+function:1 _Global_Main_StringArray {
     PushString "Hello, World!"
     PrintLine
     PushInt 0
@@ -143,8 +143,8 @@ vtable <ClassName> {
         ...
     }
     vartable {
-        <fieldName>: <Ref|Copy:<size>>@<offset>
-        <fieldName>: <Ref|Copy:<size>>@<offset>
+        <fieldName>: <typename>@<offset>
+        <fieldName>: <typename>@<offset>
         ...
     }
 }
