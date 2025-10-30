@@ -7,7 +7,7 @@ This documents contains example bytecode programs that demonstrate the compilati
 **OIL Bytecode Target:**
 ```oil
 // Simple program that prints numbers 1 to 5
-function _Global_Main_StringArray {
+function:1 _Global_Main_StringArray {
     PushInt 1
     SetLocal 1
     
@@ -51,7 +51,7 @@ fun Main(args: StringArray): Int {
 ```oil
 // Function that calculates area of rectangle
 // Arguments: Copy:8 (int), Copy:8 (int)
-function _Global_CalculateArea_int_int {
+function:2 _Global_CalculateArea_int_int {
     LoadLocal 0  // width
     LoadLocal 1  // height
     IntMultiply
@@ -60,7 +60,7 @@ function _Global_CalculateArea_int_int {
 
 // Function that processes multiple string arguments
 // Arguments: Ref (String), Ref (String), Copy:8 (int)
-function _Global_ProcessStrings_String_String_int {
+function:3 _Global_ProcessStrings_String_String_int {
     LoadLocal 0  // first string
     LoadLocal 1  // second string
     StringConcat
@@ -130,13 +130,13 @@ vtable Point {
         _ToString_<C>: _Point_ToString_<C>
     }
     vartable {
-        x: Copy:8@8
-        y: Copy:8@16
+        x: int@8
+        y: int@16
     }
 }
 
 // Constructor implementation
-function _Point_int_int {
+function:3 _Point_int_int {
     LoadLocal 0  // this pointer: put on stack by VM for constructor
     LoadLocal 1  // x argument
     SetField x
@@ -147,7 +147,7 @@ function _Point_int_int {
 }
 
 // Method: GetDistance
-function _Point_GetDistance_<C> {
+function:1 _Point_GetDistance_<C> {
     LoadLocal 0  // this pointer
     GetField x
     LoadLocal 0  // this pointer
@@ -158,7 +158,7 @@ function _Point_GetDistance_<C> {
 }
 
 // Method: CalculateDistance (private)
-function _Point_CalculateDistance_<C>_int_int {
+function:2 _Point_CalculateDistance_<C>_int_int {
     LoadLocal 0  // x
     LoadLocal 1  // y
     IntMultiply
@@ -172,7 +172,7 @@ function _Point_CalculateDistance_<C>_int_int {
 }
 
 // Interface method: IsLess (IComparable)
-function _Point_IsLess_<C>_Object {
+function:2 _Point_IsLess_<C>_Object {
     LoadLocal 0  // this pointer
     if {
         LoadLocal 1  // other object
@@ -205,7 +205,7 @@ function _Point_IsLess_<C>_Object {
 }
 
 // Interface method: ToString (IStringConvertible)
-function _Point_ToString_<C> {
+function:1 _Point_ToString_<C> {
     PushString "Point("
     LoadLocal 0
     GetField x
@@ -223,7 +223,7 @@ function _Point_ToString_<C> {
 }
 
 // Usage example
-function _Global_Main_StringArray {
+function:1 _Global_Main_StringArray {
     // Create Point object
     PushInt 3
     PushInt 4
@@ -314,8 +314,8 @@ vtable Rectangle {
         _Rectangle_GetPerimeter_<C>: _Rectangle_GetPerimeter_<C>
     }
     vartable {
-        Width: Ref@8
-        Height: Ref@16
+        Width: Float@8
+        Height: Float@16
     }
 }
 
@@ -330,12 +330,12 @@ vtable Circle {
         _Circle_GetPerimeter_<C>: _Circle_GetPerimeter_<C>
     }
     vartable {
-        Radius: Ref@8
+        Radius: Float@8
     }
 }
 
 // Rectangle constructor implementation
-function _Rectangle_float_float {
+function:3 _Rectangle_float_float {
     LoadLocal 0  // this pointer
     LoadLocal 1  // width argument
     CallConstructor Float
@@ -348,7 +348,7 @@ function _Rectangle_float_float {
 }
 
 // Rectangle interface method: GetArea
-function _Rectangle_GetArea_<C> {
+function:1 _Rectangle_GetArea_<C> {
     LoadLocal 0  // this pointer
     GetField Width
     Unwrap float
@@ -361,7 +361,7 @@ function _Rectangle_GetArea_<C> {
 }
 
 // Rectangle interface method: GetPerimeter
-function _Rectangle_GetPerimeter_<C> {
+function:1 _Rectangle_GetPerimeter_<C> {
     LoadLocal 0  // this pointer
     GetField Width
     Unwrap float
@@ -376,7 +376,7 @@ function _Rectangle_GetPerimeter_<C> {
 }
 
 // Circle constructor implementation
-function _Circle_Constructor_<M>_float {
+function:2 _Circle_Constructor_<M>_float {
     LoadLocal 0  // this pointer
     LoadLocal 1  // radius argument
     CallConstructor Float
@@ -385,7 +385,7 @@ function _Circle_Constructor_<M>_float {
 }
 
 // Circle interface method: GetArea
-function _Circle_GetArea_<C> {
+function:1 _Circle_GetArea_<C> {
     LoadLocal 0  // this pointer
     GetField Radius
     Unwrap float
@@ -400,7 +400,7 @@ function _Circle_GetArea_<C> {
 }
 
 // Circle interface method: GetPerimeter
-function _Circle_GetPerimeter_<C> {
+function:1 _Circle_GetPerimeter_<C> {
     LoadLocal 0  // this pointer
     GetField Radius
     Unwrap float
@@ -413,7 +413,7 @@ function _Circle_GetPerimeter_<C> {
 }
 
 // Polymorphic usage through interface
-function _Global_ProcessShape_IShape {
+function:1 _Global_ProcessShape_IShape {
     LoadLocal 0  // IShape object
     CallVirtual _GetArea_<C>  // GetArea method by name
     SetLocal 1
@@ -433,7 +433,7 @@ function _Global_ProcessShape_IShape {
 }
 
 // Main function demonstrating interface-based polymorphism
-function _Global_Main_StringArray {
+function:1 _Global_Main_StringArray {
     // Create Rectangle object
     PushFloat 5.0
     PushFloat 3.0
@@ -524,8 +524,8 @@ fun Main(args: StringArray): Int {
 **OIL Bytecode Target:**
 ```oil
 // Pure function that calculates mathematical operations without heap allocation
-// Arguments: Copy:8 (int), Copy:8 (int), Copy:8 (int)
-pure(Copy:8, Copy:8, Copy:8) function _Global_CalculateQuadratic_int_int_int {
+// Arguments: int (int), int (int), int (int)
+pure(int, int, int) function:3 _Global_CalculateQuadratic_int_int_int {
     LoadLocal 0  // a (copy)
     LoadLocal 1  // b (copy)
     LoadLocal 2  // c (copy)
@@ -546,8 +546,8 @@ pure(Copy:8, Copy:8, Copy:8) function _Global_CalculateQuadratic_int_int_int {
 }
 
 // Pure function that performs bitwise operations
-// Arguments: Copy:8 (int), Copy:8 (int)
-pure(Copy:8, Copy:8) function _Global_BitwiseOperations_int_int {
+// Arguments: int (int), int (int)
+pure(int, int) function:2 _Global_BitwiseOperations_int_int {
     LoadLocal 0  // first number (copy)
     LoadLocal 1  // second number (copy)
     
@@ -571,7 +571,7 @@ pure(Copy:8, Copy:8) function _Global_BitwiseOperations_int_int {
 }
 
 // Usage of pure functions
-function _Global_Main_StringArray {
+function:1 _Global_Main_StringArray {
     PushInt 2
     PushInt 5
     PushInt 3
