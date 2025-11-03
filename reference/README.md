@@ -1,6 +1,6 @@
 # Ovum Language Reference
 
-This page contains the Ovum language reference.
+This page contains the Ovum language reference. Current version: 0.1.0.
 
 ## About Ovum
 

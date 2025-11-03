@@ -38,10 +38,14 @@
 * Create type aliases for better readability: `typealias UserId = Int`
 * Can be used anywhere a type is expected: `fun ProcessUser(id: UserId): Void`
 
-## Namespaces & Preprocessor
+## Namespaces
 
-* Namespace resolution with `::` (e.g., `sys::Print`).
-* Preprocessor: `#import`, `#define`, `#ifdef`, `#ifndef`, `#else`, `#undef`.
+* Namespace resolution with `::` (e.g., `sys::Print`), declared with `namespace` keyword.
+
+## Preprocessor
+* Preprocessor commands: `#import`, `#define`, `#ifdef`, `#ifndef`, `#else`, `#undef`.
+* Multiple `#define` commands can be used to define the same symbol, as well as `#undef` to undefine a symbol.
+* `#import` does not _include_ the file at the location of the `#import` command. It adds a dependency for the current file, and after all dependencies are collected, they are included in the final compilation. Order is defined by the topological sort of the dependency graph and lexicographic order of the files to avoid cyclical dependencies and double inclusion.
 
 > **Note**: `#define` cannot be used to really define something, it is a way to control what code will be used.
 

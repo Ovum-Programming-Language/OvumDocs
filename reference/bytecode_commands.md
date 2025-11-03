@@ -10,7 +10,7 @@ All commands expect arguments of proper size on the stack and push return value 
 * `PushBool <value>` - Pushes a Boolean literal (`true` or `false`) onto the stack
 * `PushChar <value>` - Pushes a character literal onto the stack
 * `PushString <value>` - Pushes a string literal onto the stack
-* `PushNull` - Pushes `null` onto the stack
+* `PushNull` - Pushes `null` into a nullable wrapper onto the stack
 * `Pop` - Removes the top value from the stack
 * `Dup` - Duplicates the top value on the stack
 * `Swap` - Swaps the top two values on the stack
@@ -20,12 +20,12 @@ All commands expect arguments of proper size on the stack and push return value 
 
 * `LoadLocal <index>` - Loads a local variable onto the stack
 * `SetLocal <index>` - Stores the top stack value to a local variable
-* `LoadGlobal <name>` - Loads a global variable onto the stack
-* `SetGlobal <name>` - Stores the top stack value to a global variable
+* `LoadStatic <name>` - Loads a static variable onto the stack
+* `SetStatic <name>` - Stores the top stack value to a static variable
 
 ## Array Operations
 
-* `NewArray <type> <size>` - Creates a new array of specified type and size
+* `NewArray <type>` - Creates a new array of specified type (size on stack)
 * `ArrayLength` - Pushes the length of the array (top of stack)
 * `ArrayGet` - Gets element at index (array, index on stack)
 * `ArraySet` - Sets element at index (array, index, value on stack)
@@ -120,29 +120,36 @@ All commands expect arguments of proper size on the stack and push return value 
 * `IntToString` - Converts integer to string
 * `FloatToString` - Converts float to string
 
+## Conversion Operations
+
+* `IntToFloat` - Converts integer to float
+* `FloatToInt` - Converts float to integer
+* `ByteToInt` - Converts byte to integer
+* `CharToByte` - Converts character to byte
+* `ByteToChar` - Converts byte to character
+* `BoolToByte` - Converts bool to byte
+
 ## Control Flow
 
 * `Call <function>` - Calls a function
 * `CallIndirect` - Calls function at address on stack
-* `CallVirtual <methodName>` - Calls virtual method using vtable dispatch by method name.
+* `CallVirtual <method>` - Calls virtual method using vtable dispatch by method name (without class name).
 * `Return` - Returns from current function
 
 ## Object Operations
 
-* `GetField <name>` - Gets object field (object on stack)
-* `SetField <name>` - Sets object field (object, value on stack)
-* `CallConstructor <class>` - Calls object constructor (arguments on stack)
-* `Unwrap <class>` - Unwraps value from primitive to fundamental
+* `GetField <number>` - Gets object field by index in vartable (object on stack)
+* `SetField <number>` - Sets object field by index in vartable (object, value on stack)
+* `CallConstructor <constructor>` - Calls object constructor (arguments on stack except `this`)
+* `Unwrap` - Unwraps the first field of the object (including nullable and primitive reference types)
 * `GetVTable <class>` - Gets vtable for specified class
 * `SetVTable <class>` - Sets vtable for object instance
-* `IsNull` - Tests if top of stack is null
-* `IsNotNull` - Tests if top of stack is not null
 
 ## Nullable Operations
 
 * `SafeCall <method>` - Safe method call on nullable object
-* `NullCoalesce` - Null coalescing operator (a ?? b)
-* `Unwrap` - Unwraps nullable value
+* `NullCoalesce` - Null coalescing operator (a ?: b from stack)
+* `IsNull` - Tests if top of stack is a wrapper that contains null
 
 ## System Library Commands
 
@@ -152,6 +159,8 @@ All commands expect arguments of proper size on the stack and push return value 
 * `PrintLine` - Prints string followed by newline
 * `ReadLine` - Reads line from standard input
 * `ReadChar` - Reads single character from standard input
+* `ReadInt` - Reads integer from standard input
+* `ReadFloat` - Reads float from standard input
 
 ## Time Operations
 
@@ -216,10 +225,10 @@ All commands expect arguments of proper size on the stack and push return value 
 
 ## Foreign Function Interface
 
-* `Interope` - Calls external function via FFI (unsafe)
+* `Interop` - Calls external function via FFI (unsafe)
 
 ## Type Operations
 
-* `TypeOf` - Gets type of value on stack
-* `IsType <type>` - Tests if value is of specific type
+* `TypeOf` - Gets type name of value on stack
+* `IsType <type>` - Tests if value is of specific type or interface
 * `SizeOf <type>` - Gets size of type in bytes

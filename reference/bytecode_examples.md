@@ -17,7 +17,7 @@ function:1 _Global_Main_StringArray {
         IntLessEqual
     } then {
         LoadLocal 1
-        CallConstructor Int
+        CallConstructor _Int_int
         Call _Int_ToString_<C>
         PrintLine
         LoadLocal 1
@@ -139,21 +139,21 @@ vtable Point {
 function:3 _Point_int_int {
     LoadLocal 0  // this pointer: put on stack by VM for constructor
     LoadLocal 1  // x argument
-    SetField x
+    SetField 0
     LoadLocal 0  // this pointer
     LoadLocal 2  // y argument
-    SetField y
+    SetField 1
     Return
 }
 
 // Method: GetDistance
 function:1 _Point_GetDistance_<C> {
     LoadLocal 0  // this pointer
-    GetField x
+    GetField 0
     LoadLocal 0  // this pointer
-    GetField y
+    GetField 1
     Call _Point_CalculateDistance_<C>_int_int
-    CallConstructor Float
+    CallConstructor _Float_float
     Return
 }
 
@@ -166,7 +166,7 @@ function:2 _Point_CalculateDistance_<C>_int_int {
     LoadLocal 1  // y
     IntMultiply
     IntAdd
-    CallConstructor float
+    IntToFloat
     FloatSqrt
     Return
 }
@@ -184,22 +184,22 @@ function:2 _Point_IsLess_<C>_Object {
     }
     if {
         LoadLocal 0
-        GetField x
+        GetField 0
         LoadLocal 1
-        GetField x
+        GetField 0
         IntNotEqual
     } then {
         LoadLocal 0
-        GetField x
+        GetField 0
         LoadLocal 1
-        GetField x
+        GetField 0
         IntLess
         Return
     }
     LoadLocal 0
-    GetField y
+    GetField 1
     LoadLocal 1
-    GetField y
+    GetField 1
     IntLess
     Return
 }
@@ -208,13 +208,13 @@ function:2 _Point_IsLess_<C>_Object {
 function:1 _Point_ToString_<C> {
     PushString "Point("
     LoadLocal 0
-    GetField x
+    GetField 0
     IntToString
     StringConcat
     PushString ", "
     StringConcat
     LoadLocal 0
-    GetField y
+    GetField 1
     IntToString
     StringConcat
     PushString ")"
@@ -227,14 +227,14 @@ function:1 _Global_Main_StringArray {
     // Create Point object
     PushInt 3
     PushInt 4
-    CallConstructor Point
+    CallConstructor _Point_int_int
     SetLocal 0
     LoadLocal 0
     Call _Point_GetDistance_<C> // Call regular methods
     Call _Float_ToString_<C>
     PrintLine
     LoadLocal 0
-    Call Point_ToString_<C>
+    Call _Point_ToString_<C>
     PrintLine
     
     PushInt 0
@@ -338,40 +338,40 @@ vtable Circle {
 function:3 _Rectangle_float_float {
     LoadLocal 0  // this pointer
     LoadLocal 1  // width argument
-    CallConstructor Float
-    SetField Width
+    CallConstructor _Float_float
+    SetField 0
     LoadLocal 0  // this pointer
     LoadLocal 2  // height argument
-    CallConstructor Float
-    SetField Height
+    CallConstructor _Float_float
+    SetField 1
     Return
 }
 
 // Rectangle interface method: GetArea
 function:1 _Rectangle_GetArea_<C> {
     LoadLocal 0  // this pointer
-    GetField Width
-    Unwrap float
+    GetField 0
+    Unwrap
     LoadLocal 0  // this pointer
-    GetField Height
-    Unwrap float
+    GetField 1
+    Unwrap
     FloatMultiply
-    CallConstructor Float
+    CallConstructor _Float_float
     Return
 }
 
 // Rectangle interface method: GetPerimeter
 function:1 _Rectangle_GetPerimeter_<C> {
     LoadLocal 0  // this pointer
-    GetField Width
-    Unwrap float
+    GetField 0
+    Unwrap
     LoadLocal 0  // this pointer
-    GetField Height
-    Unwrap float
+    GetField 1
+    Unwrap
     FloatAdd
     PushFloat 2.0
     FloatMultiply
-    CallConstructor Float
+    CallConstructor _Float_float
     Return
 }
 
@@ -379,36 +379,36 @@ function:1 _Rectangle_GetPerimeter_<C> {
 function:2 _Circle_Constructor_<M>_float {
     LoadLocal 0  // this pointer
     LoadLocal 1  // radius argument
-    CallConstructor Float
-    SetField Radius
+    CallConstructor _Float_float
+    SetField 0
     Return
 }
 
 // Circle interface method: GetArea
 function:1 _Circle_GetArea_<C> {
     LoadLocal 0  // this pointer
-    GetField Radius
-    Unwrap float
+    GetField 0
+    Unwrap
     LoadLocal 0  // this pointer
-    GetField Radius
-    Unwrap float
+    GetField 0
+    Unwrap
     FloatMultiply
     PushFloat 3.14159
     FloatMultiply
-    CallConstructor Float
+    CallConstructor _Float_float
     Return
 }
 
 // Circle interface method: GetPerimeter
 function:1 _Circle_GetPerimeter_<C> {
     LoadLocal 0  // this pointer
-    GetField Radius
-    Unwrap float
+    GetField 0
+    Unwrap
     PushFloat 2.0
     FloatMultiply
     PushFloat 3.14159
     FloatMultiply
-    CallConstructor Float
+    CallConstructor _Float_float
     Return
 }
 
@@ -437,11 +437,11 @@ function:1 _Global_Main_StringArray {
     // Create Rectangle object
     PushFloat 5.0
     PushFloat 3.0
-    CallConstructor Rectangle
+    CallConstructor _Rectangle_float_float
     SetLocal 1
     // Create Circle object
     PushFloat 2.5
-    CallConstructor Circle
+    CallConstructor _Circle_float
     SetLocal 2
     LoadLocal 1
     Call _Global_ProcessShape_IShape
