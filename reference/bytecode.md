@@ -169,9 +169,11 @@ Function names are mangled to include fully qualified class names for method res
 * **Class methods**: `_<ClassName>_<methodName>_<constFlag>_<arg1Type>_<arg2Type>_..._<argNType>`
 * **Nested classes**: `_<OuterClass>_<InnerClass>_<methodName>_<constFlag>_<arg1Type>_<arg2Type>_..._<argNType>`
 
+> **Note**: Namespaces are included in the class and function names, e.g. `_test_FooBar_Int` for `test::FooBar(a : Int)` function.
+
 **Argument mutability indicators:**
 * `<M>` - Mutable argument (`var` parameter)
-* `<C>` - Const argument (default, immutable parameter)
+* `<C>` - Const argument (default, immutable parameter, omitted)
 
 **Const method flag:**
 * `<M>` - Mutable method (can modify object state)
@@ -206,6 +208,5 @@ _Global_Main_StringArray
 * All command names use PascalCase convention
 * Stack operations are performed on the top elements of the stack
 * Local variables are indexed starting from 0
-* Function calls preserve the stack state except for return values
 * The bytecode is designed to be platform-independent and executed by the Ovum Virtual Machine (OVM)
-* JIT compilation optimizes frequently executed bytecode sequences to native machine code
+* JIT compilation optimizes frequently executed functions to native machine code
