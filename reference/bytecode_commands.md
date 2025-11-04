@@ -20,8 +20,8 @@ All commands expect arguments of proper size on the stack and push return value 
 
 * `LoadLocal <index>` - Loads a local variable onto the stack
 * `SetLocal <index>` - Stores the top stack value to a local variable
-* `LoadStatic <name>` - Loads a static variable onto the stack
-* `SetStatic <name>` - Stores the top stack value to a static variable
+* `LoadStatic <index>` - Loads a static variable onto the stack
+* `SetStatic <index>` - Stores the top stack value to a static variable
 
 ## Array Operations
 

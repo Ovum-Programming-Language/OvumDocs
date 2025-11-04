@@ -70,6 +70,22 @@ While loops consist of separate condition blocks and execution blocks connected 
 }
 ```
 
+#### Init-Static Block
+
+The `init-static` block is a unique block that must appear exactly once in a bytecode file. It contains initialization code that is executed before the `Main` function is called, primarily for setting up static variables:
+
+```oil
+// Static initialization block (must be unique, executed before Main)
+init-static {
+    PushInt 42
+    SetStatic 0  // Set static variable at index 0
+    PushString "Initialized"
+    SetStatic 1  // Set static variable at index 1
+    PushFloat 3.14
+    SetStatic 2  // Set static variable at index 2
+}
+```
+
 #### Functions
 
 Functions are defined with optional keywords and contain a sequence of bytecode instructions:

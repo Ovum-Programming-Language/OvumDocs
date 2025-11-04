@@ -5,7 +5,7 @@
 * Declared with `fun`, PascalCase names: `fun Compute(a: Int): Int { ... }`
 * **Pure** functions: `pure fun Hash(o: Object): Int { ... }`
   * Side-effect free; VM may cache results.
-  * If parameters include user-defined reference types, those types must implement **`IComparable`**.
+  * If parameters include user-defined reference types, those types must implement **`IHashable`**.
 
 ## Classes
 

@@ -299,10 +299,15 @@ fun Main(args: StringArray): Int {
 }
 ```
 
-## Interface-Based Polymorphism
+## Interface-Based Polymorphism and Static Variables
 
 **OIL Bytecode Target:**
 ```oil
+init-static {
+    PushFloat 3.14159
+    SetStatic 0
+}
+
 // Rectangle VTable definition
 vtable Rectangle {
     size: 24 // 4 bytes (vtable index) + 4 bytes (badge) + 2 * Ref (8 bytes each)
@@ -386,14 +391,14 @@ function:2 _Circle_Constructor_<M>_float {
 
 // Circle interface method: GetArea
 function:1 _Circle_GetArea_<C> {
-    LoadLocal 0  // this pointer
-    GetField 0
-    Unwrap
+    LoadStatic 0  // PI
     LoadLocal 0  // this pointer
     GetField 0
     Unwrap
     FloatMultiply
-    PushFloat 3.14159
+    LoadLocal 0  // this pointer
+    GetField 0
+    Unwrap
     FloatMultiply
     CallConstructor _Float_float
     Return
@@ -401,12 +406,12 @@ function:1 _Circle_GetArea_<C> {
 
 // Circle interface method: GetPerimeter
 function:1 _Circle_GetPerimeter_<C> {
+    PushFloat 2.0
+    LoadStatic 0  // PI
+    FloatMultiply
     LoadLocal 0  // this pointer
     GetField 0
     Unwrap
-    PushFloat 2.0
-    FloatMultiply
-    PushFloat 3.14159
     FloatMultiply
     CallConstructor _Float_float
     Return
@@ -460,6 +465,8 @@ function:1 _Global_Main_StringArray {
 
 **Ovum Source Code:**
 ```ovum
+static val PI: Float = 3.14159
+
 interface IShape {
     fun GetArea(): Float
     fun GetPerimeter(): Float
@@ -493,11 +500,11 @@ class Circle implements IShape {
     }
     
     public override fun GetArea(): Float {
-        return 3.14159 * Radius * Radius
+        return PI * Radius * Radius
     }
     
     public override fun GetPerimeter(): Float {
-        return 2.0 * 3.14159 * Radius
+        return 2.0 * PI * Radius
     }
 }
 
