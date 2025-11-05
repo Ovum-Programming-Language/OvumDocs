@@ -310,7 +310,7 @@ init-static {
 
 // Rectangle VTable definition
 vtable Rectangle {
-    size: 24 // 4 bytes (vtable index) + 4 bytes (badge) + 2 * Ref (8 bytes each)
+    size: 24 // 4 bytes (vtable index) + 4 bytes (badge) + 2 * Object (8 bytes each)
     interfaces {
         IShape
     }
@@ -319,14 +319,14 @@ vtable Rectangle {
         _Rectangle_GetPerimeter_<C>: _Rectangle_GetPerimeter_<C>
     }
     vartable {
-        Width: Float@8
-        Height: Float@16
+        Width: Object@8
+        Height: Object@16
     }
 }
 
 // Circle VTable definition
 vtable Circle {
-    size: 16 // 4 bytes (vtable index) + 4 bytes (badge) + 1 * Ref (8 bytes)
+    size: 16 // 4 bytes (vtable index) + 4 bytes (badge) + 1 * Object (8 bytes)
     interfaces {
         IShape
     }
@@ -335,7 +335,7 @@ vtable Circle {
         _Circle_GetPerimeter_<C>: _Circle_GetPerimeter_<C>
     }
     vartable {
-        Radius: Float@8
+        Radius: Object@8
     }
 }
 

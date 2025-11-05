@@ -9,6 +9,7 @@ All commands expect arguments of proper size on the stack and push return value 
 * `PushFloat <value>` - Pushes a 64-bit floating-point literal onto the stack
 * `PushBool <value>` - Pushes a Boolean literal (`true` or `false`) onto the stack
 * `PushChar <value>` - Pushes a character literal onto the stack
+* `PushByte <value>` - Pushes a byte literal onto the stack
 * `PushString <value>` - Pushes a string literal onto the stack
 * `PushNull` - Pushes `null` into a nullable wrapper onto the stack
 * `Pop` - Removes the top value from the stack
