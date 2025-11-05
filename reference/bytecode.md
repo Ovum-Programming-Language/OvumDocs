@@ -111,8 +111,8 @@ pure(int, int) function:2 _Global_IsEven_int_int {
 }
 
 // Pure function with mixed argument types
-// Arguments: Obj (String), int (int)
-pure(Obj, int) function:2 _Global_StringRepeat_String_int {
+// Arguments: String, int
+pure(String, int) function:2 _Global_StringRepeat_String_int {
     LoadLocal 0  // String reference
     LoadLocal 1  // Int copy
     Call _Global_StringRepeatImpl_String_int
@@ -159,8 +159,8 @@ vtable <ClassName> {
         ...
     }
     vartable {
-        <fieldName>: <typename>@<offset>
-        <fieldName>: <typename>@<offset>
+        <fieldName>: <typename|Object>@<offset> // typename for fundamental types, Object for user-defined types
+        <fieldName>: <typename|Object>@<offset> // typename for fundamental types, Object for user-defined types
         ...
     }
 }
