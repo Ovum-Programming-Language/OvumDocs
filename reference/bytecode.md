@@ -8,6 +8,65 @@ See also: [bytecode command list](./bytecode_commands.md) and [bytecode examples
 
 Ovum bytecode follows a stack-based execution model where operations consume values from the stack and push results back onto the stack. The syntax uses WASM-like code blocks enclosed in curly braces `{}`.
 
+### Stack Operation Convention
+
+OIL follows a consistent convention for all stack operations: **operands are pushed from right to left** (the rightmost operand is pushed first, the leftmost operand is pushed last).
+
+This convention applies to:
+* **Function calls**: Arguments are pushed right-to-left
+* **Binary operations**: Right operand is pushed first, then left operand
+* **Comparison operations**: Right operand is pushed first, then left operand
+* **All stack-based operations**: Right operand first, left operand last
+
+**Function Arguments:**
+* **Argument pushing**: Arguments are pushed onto the stack from **right to left** (the rightmost argument is pushed first, the leftmost argument is pushed last)
+* **Argument popping**: When a function executes, it pops arguments from the stack from **left to right** (the leftmost argument is at `LoadLocal 0`, the next at `LoadLocal 1`, etc.)
+
+This means that for a function call `foo(a, b, c)`, the bytecode should:
+1. Push `c` (rightmost argument)
+2. Push `b` (middle argument)
+3. Push `a` (leftmost argument)
+4. Call `foo`
+
+Inside the function, `LoadLocal 0` will access `a`, `LoadLocal 1` will access `b`, and `LoadLocal 2` will access `c`.
+
+**Binary Operations:**
+For binary operations like `a + b`, `a * b`, `a < b`, etc., the right operand is pushed first, then the left operand:
+1. Push `b` (right operand)
+2. Push `a` (left operand)
+3. Execute operation (e.g., `IntAdd`, `IntMultiply`, `IntLessThan`)
+
+**Examples:**
+```oil
+// Function definition: fun Add(x: Int, y: Int): Int
+function:2 _Global_Add_int_int {
+    LoadLocal 0  // x (first argument, leftmost)
+    LoadLocal 1  // y (second argument, rightmost)
+    IntAdd
+    Return
+}
+
+// Function call: Add(5, 3)
+PushInt 3  // Push rightmost argument first
+PushInt 5  // Push leftmost argument last
+Call _Global_Add_int_int
+
+// Binary operation: x + y
+LoadLocal 1  // y (right operand)
+LoadLocal 0  // x (left operand)
+IntAdd
+
+// Comparison: i <= 5
+PushInt 5  // 5 (right operand)
+LoadLocal 1  // i (left operand)
+IntLessEqual
+
+// String concatenation: "Hello" + "World"
+PushString "World"  // right operand
+PushString "Hello"  // left operand
+StringConcat
+```
+
 ### Control Flow Structures
 
 #### If Statements

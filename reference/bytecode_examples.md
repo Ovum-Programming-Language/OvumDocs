@@ -12,16 +12,16 @@ function:1 _Global_Main_StringArray {
     SetLocal 1
     
     while {
-        LoadLocal 1
-        PushInt 5
+        PushInt 5  // right operand
+        LoadLocal 1  // left operand
         IntLessEqual
     } then {
         LoadLocal 1
         CallConstructor _Int_int
         Call _Int_ToString_<C>
         PrintLine
-        LoadLocal 1
-        PushInt 1
+        PushInt 1  // right operand
+        LoadLocal 1  // left operand
         IntAdd
         SetLocal 1
     }
@@ -52,8 +52,8 @@ fun Main(args: StringArray): Int {
 // Function that calculates area of rectangle
 // Arguments: Copy:8 (int), Copy:8 (int)
 function:2 _Global_CalculateArea_int_int {
-    LoadLocal 0  // width
-    LoadLocal 1  // height
+    LoadLocal 1  // height (right operand)
+    LoadLocal 0  // width (left operand)
     IntMultiply
     Return
 }
@@ -61,8 +61,8 @@ function:2 _Global_CalculateArea_int_int {
 // Function that processes multiple string arguments
 // Arguments: Ref (String), Ref (String), Copy:8 (int)
 function:3 _Global_ProcessStrings_String_String_int {
-    LoadLocal 0  // first string
-    LoadLocal 1  // second string
+    LoadLocal 1  // second string (right operand)
+    LoadLocal 0  // first string (left operand)
     StringConcat
     LoadLocal 2  // repeat count
     
@@ -75,17 +75,17 @@ function:3 _Global_ProcessStrings_String_String_int {
     SetLocal 5  // counter
     
     while {
-        LoadLocal 5
-        LoadLocal 2
+        LoadLocal 2  // repeatCount (right operand)
+        LoadLocal 5  // counter (left operand)
         IntLessThan
     } then {
-        LoadLocal 4
-        LoadLocal 3
+        LoadLocal 3  // concatenated (right operand)
+        LoadLocal 4  // result (left operand)
         StringConcat
         SetLocal 4
         
-        LoadLocal 5
-        PushInt 1
+        PushInt 1  // right operand
+        LoadLocal 5  // left operand
         IntAdd
         SetLocal 5
     }
@@ -149,9 +149,9 @@ function:3 _Point_int_int {
 // Method: GetDistance
 function:1 _Point_GetDistance_<C> {
     LoadLocal 0  // this pointer
-    GetField 0
+    GetField 1  // y (rightmost argument)
     LoadLocal 0  // this pointer
-    GetField 1
+    GetField 0  // x (leftmost argument)
     Call _Point_CalculateDistance_<C>_int_int
     CallConstructor _Float_float
     Return
@@ -159,12 +159,16 @@ function:1 _Point_GetDistance_<C> {
 
 // Method: CalculateDistance (private)
 function:2 _Point_CalculateDistance_<C>_int_int {
-    LoadLocal 0  // x
-    LoadLocal 1  // y
-    IntMultiply
-    LoadLocal 0  // x
-    LoadLocal 1  // y
-    IntMultiply
+    // Calculate x * x
+    LoadLocal 0  // x (right operand)
+    LoadLocal 0  // x (left operand)
+    IntMultiply  // x * x, stack: [x*x]
+    // Calculate y * y (pushes on top of x*x)
+    LoadLocal 1  // y (right operand)
+    LoadLocal 1  // y (left operand)
+    IntMultiply  // y * y, stack: [y*y, x*x] (y*y on top)
+    // Add: x*x + y*y (addition is commutative, so y*y + x*x = x*x + y*y)
+    // IntAdd computes top op bottom: y*y + x*x
     IntAdd
     IntToFloat
     FloatSqrt
@@ -183,50 +187,63 @@ function:2 _Point_IsLess_<C>_Object {
         Return
     }
     if {
-        LoadLocal 0
+        LoadLocal 1  // other (right operand)
         GetField 0
-        LoadLocal 1
+        LoadLocal 0  // this (left operand)
         GetField 0
-        IntNotEqual
+        IntNotEqual  // this.x != other.x
     } then {
-        LoadLocal 0
+        LoadLocal 1  // other (right operand)
         GetField 0
-        LoadLocal 1
+        LoadLocal 0  // this (left operand)
         GetField 0
-        IntLess
+        IntLess  // this.x < other.x
         Return
     }
-    LoadLocal 0
+    LoadLocal 1  // other (right operand)
     GetField 1
-    LoadLocal 1
+    LoadLocal 0  // this (left operand)
     GetField 1
-    IntLess
+    IntLess  // this.y < other.y
     Return
 }
 
 // Interface method: ToString (IStringConvertible)
 function:1 _Point_ToString_<C> {
-    PushString "Point("
+    // "Point(" + Int(x).ToString()
     LoadLocal 0
     GetField 0
-    IntToString
-    StringConcat
-    PushString ", "
-    StringConcat
+    IntToString  // Int(x).ToString() (right operand)
+    PushString "Point("  // left operand
+    StringConcat  // "Point(" + Int(x).ToString(), stack: [result]
+    
+    // previous + ", "
+    // Stack: [previous]
+    PushString ", "  // right operand, stack: [", ", previous]
+    Swap  // stack: [previous, ", "]
+    StringConcat  // previous + ", ", stack: [result]
+    
+    // previous + Int(y).ToString()
+    // Stack: [previous]
     LoadLocal 0
     GetField 1
-    IntToString
-    StringConcat
-    PushString ")"
-    StringConcat
+    IntToString  // Int(y).ToString() (right operand), stack: [Int(y).ToString(), previous]
+    Swap  // stack: [previous, Int(y).ToString()]
+    StringConcat  // previous + Int(y).ToString(), stack: [result]
+    
+    // previous + ")"
+    // Stack: [previous]
+    PushString ")"  // right operand, stack: [")", previous]
+    Swap  // stack: [previous, ")"]
+    StringConcat  // previous + ")", stack: [result]
     Return
 }
 
 // Usage example
 function:1 _Global_Main_StringArray {
     // Create Point object
-    PushInt 3
-    PushInt 4
+    PushInt 4  // y (rightmost argument)
+    PushInt 3  // x (leftmost argument)
     CallConstructor _Point_int_int
     SetLocal 0
     LoadLocal 0
@@ -355,12 +372,12 @@ function:3 _Rectangle_float_float {
 // Rectangle interface method: GetArea
 function:1 _Rectangle_GetArea_<C> {
     LoadLocal 0  // this pointer
-    GetField 0
+    GetField 1  // Height (right operand)
     Unwrap
     LoadLocal 0  // this pointer
-    GetField 1
+    GetField 0  // Width (left operand)
     Unwrap
-    FloatMultiply
+    FloatMultiply  // Width * Height
     CallConstructor _Float_float
     Return
 }
@@ -368,14 +385,14 @@ function:1 _Rectangle_GetArea_<C> {
 // Rectangle interface method: GetPerimeter
 function:1 _Rectangle_GetPerimeter_<C> {
     LoadLocal 0  // this pointer
-    GetField 0
+    GetField 1  // Height (right operand)
     Unwrap
     LoadLocal 0  // this pointer
-    GetField 1
+    GetField 0  // Width (left operand)
     Unwrap
-    FloatAdd
-    PushFloat 2.0
-    FloatMultiply
+    FloatAdd  // Width + Height
+    PushFloat 2.0  // right operand
+    FloatMultiply  // 2.0 * (Width + Height)
     CallConstructor _Float_float
     Return
 }
@@ -391,28 +408,28 @@ function:2 _Circle_Constructor_<M>_float {
 
 // Circle interface method: GetArea
 function:1 _Circle_GetArea_<C> {
-    LoadStatic 0  // PI
     LoadLocal 0  // this pointer
     GetField 0
-    Unwrap
-    FloatMultiply
+    Unwrap  // Radius (right operand for first multiply)
+    LoadStatic 0  // PI (left operand for first multiply)
+    FloatMultiply  // PI * Radius, stack: [PI*Radius]
     LoadLocal 0  // this pointer
     GetField 0
-    Unwrap
-    FloatMultiply
+    Unwrap  // Radius (right operand for second multiply)
+    FloatMultiply  // (PI * Radius) * Radius, stack: [PI*Radius*Radius]
     CallConstructor _Float_float
     Return
 }
 
 // Circle interface method: GetPerimeter
 function:1 _Circle_GetPerimeter_<C> {
-    PushFloat 2.0
-    LoadStatic 0  // PI
-    FloatMultiply
+    LoadStatic 0  // PI (right operand for first multiply)
+    PushFloat 2.0  // left operand for first multiply
+    FloatMultiply  // 2.0 * PI, stack: [2.0*PI]
     LoadLocal 0  // this pointer
     GetField 0
-    Unwrap
-    FloatMultiply
+    Unwrap  // Radius (right operand for second multiply)
+    FloatMultiply  // (2.0 * PI) * Radius
     CallConstructor _Float_float
     Return
 }
@@ -425,27 +442,36 @@ function:1 _Global_ProcessShape_IShape {
     LoadLocal 0
     CallVirtual _GetPerimeter_<C>  // GetPerimeter method by name
     SetLocal 2
-    PushString "Area: "
+    // "Area: " + area.ToString()
     LoadLocal 1
-    Call _Float_ToString_<C>
-    StringConcat
-    PushString ", Perimeter: "
-    StringConcat
+    Call _Float_ToString_<C>  // area.ToString() (right operand)
+    PushString "Area: "  // left operand
+    StringConcat  // "Area: " + area.ToString(), stack: [result]
+    
+    // previous + ", Perimeter: "
+    // Stack: [previous]
+    PushString ", Perimeter: "  // right operand, stack: [", Perimeter: ", previous]
+    Swap  // stack: [previous, ", Perimeter: "]
+    StringConcat  // previous + ", Perimeter: ", stack: [result]
+    
+    // previous + perimeter.ToString()
+    // Stack: [previous]
     LoadLocal 2
-    Call _Float_ToString_<C>
-    StringConcat
+    Call _Float_ToString_<C>  // perimeter.ToString() (right operand), stack: [perimeter.ToString(), previous]
+    Swap  // stack: [previous, perimeter.ToString()]
+    StringConcat  // previous + perimeter.ToString(), stack: [result]
     Return
 }
 
 // Main function demonstrating interface-based polymorphism
 function:1 _Global_Main_StringArray {
     // Create Rectangle object
-    PushFloat 5.0
-    PushFloat 3.0
+    PushFloat 3.0  // height (rightmost argument)
+    PushFloat 5.0  // width (leftmost argument)
     CallConstructor _Rectangle_float_float
     SetLocal 1
     // Create Circle object
-    PushFloat 2.5
+    PushFloat 2.5  // radius (only argument)
     CallConstructor _Circle_float
     SetLocal 2
     LoadLocal 1
@@ -533,42 +559,43 @@ fun Main(args: StringArray): Int {
 // Pure function that calculates mathematical operations without heap allocation
 // Arguments: int (int), int (int), int (int)
 pure(int, int, int) function:3 _Global_CalculateQuadratic_int_int_int {
-    LoadLocal 0  // a (copy)
-    LoadLocal 1  // b (copy)
-    LoadLocal 2  // c (copy)
+    // Calculate b^2
+    LoadLocal 1  // b (right operand)
+    LoadLocal 1  // b (left operand)
+    IntMultiply  // b^2, stack: [b*b]
+    SetLocal 3  // save b*b
     
-    // Calculate discriminant: b^2 - 4ac
-    LoadLocal 1  // b
-    LoadLocal 1  // b
-    IntMultiply  // b^2
+    // Calculate 4 * a * c = (4 * a) * c
+    LoadLocal 0  // a (right operand for 4*a)
+    PushInt 4  // 4 (left operand for 4*a)
+    IntMultiply  // 4*a, stack: [4*a]
+    LoadLocal 2  // c (right operand for (4*a)*c)
+    IntMultiply  // 4*a*c, stack: [4*a*c]
     
-    LoadLocal 0  // a
-    LoadLocal 2  // c
-    IntMultiply  // a*c
-    PushInt 4
-    IntMultiply  // 4ac
-    
-    IntSubtract  // b^2 - 4ac
+    // Subtract: b^2 - 4*a*c
+    LoadLocal 3  // b*b (left operand)
+    IntSubtract  // b^2 - 4*a*c
     Return
 }
 
 // Pure function that performs bitwise operations
 // Arguments: int (int), int (int)
 pure(int, int) function:2 _Global_BitwiseOperations_int_int {
-    LoadLocal 0  // first number (copy)
-    LoadLocal 1  // second number (copy)
-    
-    // Calculate AND, OR, XOR results
+    // Calculate AND: first & second
+    LoadLocal 1  // second (right operand)
+    LoadLocal 0  // first (left operand)
     IntAnd
     SetLocal 2  // AND result
     
-    LoadLocal 0
-    LoadLocal 1
+    // Calculate OR: first | second
+    LoadLocal 1  // second (right operand)
+    LoadLocal 0  // first (left operand)
     IntOr
     SetLocal 3  // OR result
     
-    LoadLocal 0
-    LoadLocal 1
+    // Calculate XOR: first ^ second
+    LoadLocal 1  // second (right operand)
+    LoadLocal 0  // first (left operand)
     IntXor
     SetLocal 4  // XOR result
     
@@ -579,17 +606,17 @@ pure(int, int) function:2 _Global_BitwiseOperations_int_int {
 
 // Usage of pure functions
 function:1 _Global_Main_StringArray {
-    PushInt 2
-    PushInt 5
-    PushInt 3
+    PushInt 3  // c (rightmost argument)
+    PushInt 5  // b (middle argument)
+    PushInt 2  // a (leftmost argument)
     Call _Global_CalculateQuadratic_int_int_int
     SetLocal 1 // this line and line below can possibly be optimized out by the compiler
     LoadLocal 1
     IntToString
     PrintLine
     
-    PushInt 15
-    PushInt 7
+    PushInt 7   // second (rightmost argument)
+    PushInt 15  // first (leftmost argument)
     Call _Global_BitwiseOperations_int_int
     SetLocal 2 // this line and line below can possibly be optimized out by the compiler
     LoadLocal 2
