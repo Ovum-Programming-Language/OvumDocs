@@ -24,13 +24,6 @@ All commands expect arguments of proper size on the stack and push return value 
 * `LoadStatic <index>` - Loads a static variable onto the stack
 * `SetStatic <index>` - Stores the top stack value to a static variable
 
-## Array Operations
-
-* `NewArray <type>` - Creates a new array of specified type (size on stack)
-* `ArrayLength` - Pushes the length of the array (top of stack)
-* `ArrayGet` - Gets element at index (array, index on stack)
-* `ArraySet` - Sets element at index (array, index, value on stack)
-
 ## Arithmetic Operations
 
 ## Integer Operations
@@ -174,8 +167,6 @@ All commands expect arguments of proper size on the stack and push return value 
 
 ## File Operations
 
-* `OpenFile` - Opens file with specified mode
-* `CloseFile` - Closes file
 * `FileExists` - Checks if file exists
 * `DirectoryExists` - Checks if directory exists
 * `CreateDirectory` - Creates directory
