@@ -54,6 +54,7 @@ Provides ordering capability for sorting and comparison:
 ```ovum
 interface IComparable {
     fun IsLess(other: Object): Bool
+    fun Equals(other: Object): Bool
 }
 
 class Point implements IComparable {
@@ -71,6 +72,12 @@ class Point implements IComparable {
         val p: Point = (other as Point) ?: Point(0, 0)
         if (this.X != p.X) return this.X < p.X
         return this.Y < p.Y
+    }
+
+    public override fun Equals(other: Object): Bool {
+        if (!(other is Point)) return false
+        val p: Point = (other as Point) ?: Point(0, 0)
+        return this.X == p.X && this.Y == p.Y
     }
 }
 ```
@@ -95,6 +102,8 @@ class Point implements IHashable {
     }
 }
 ```
+
+**Required for pure function parameters** (provides stable ordering/keys).
 
 ## Class Definitions
 
@@ -160,10 +169,11 @@ class Rectangle {
     }
 }
 ```
+> Note that constructors can return something else than the instance itself, but it is not recommended unless a wrapper will be returned (e.g. nullable).
 
 ### Methods
 
-Methods can be regular, pure, or override:
+Methods can be regular, pure, no-jit or override:
 
 ```ovum
 class Calculator implements IStringConvertible {
@@ -171,7 +181,7 @@ class Calculator implements IStringConvertible {
         return a + b
     }
     
-    public pure fun Multiply(a: Int, b: Int): Int {
+    public pure no-jit fun Multiply(a: Int, b: Int): Int {
         return a * b
     }
     
@@ -203,7 +213,6 @@ class FileHandler {
 ```ovum
 interface InterfaceName extends BaseInterface {
     // Method declarations
-    // Property declarations
 }
 ```
 
@@ -219,22 +228,6 @@ interface IShape {
 interface IColorable {
     fun SetColor(color: String): Void
     fun GetColor(): String
-}
-```
-
-### Property Declarations
-
-Interfaces can declare properties that implementing classes must provide:
-
-```ovum
-interface IReadable {
-    val IsReadable: Bool
-    val Content: String
-}
-
-class Document implements IReadable {
-    public val IsReadable: Bool = true
-    public val Content: String
 }
 ```
 
