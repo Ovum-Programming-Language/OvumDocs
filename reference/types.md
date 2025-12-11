@@ -62,6 +62,10 @@ Primitive reference types are built-in reference wrappers around fundamental typ
   * Literals: `"Hello"`, `"Multi-line\nstring"`, `""` (empty string)
   * Concatenation: `"Hello" + " " + "World"`
 
+* **`File`** - file operations
+  * Literals: `sys::OpenFile("data.txt", "r")`
+  * Methods: `Read(): ByteArray`, `ReadLine(): String`, `Write(data: ByteArray): Bool`, `WriteLine(text: String): Bool`, `Close(): Void`, `IsOpen(): Bool`
+
 * **`Object`** - root of all reference types
   * Implicit base class for all user-defined types
   * Contains only a virtual destructor
@@ -71,12 +75,12 @@ Primitive reference types are built-in reference wrappers around fundamental typ
 Ovum provides specialized array classes for different element types (no generics/templates):
 
 **Primitive Arrays:**
-* `IntArray` - array of `Int` reference wrappers
-* `FloatArray` - array of `Float` reference wrappers
-* `BoolArray` - array of `Bool` reference wrappers
-* `CharArray` - array of `Char` reference wrappers
-* `ByteArray` - array of `Byte` reference wrappers
-* `PointerArray` - array of `Pointer` reference wrappers
+* `IntArray` - array of `int` values
+* `FloatArray` - array of `float` values
+* `BoolArray` - array of `bool` values
+* `CharArray` - array of `char` values
+* `ByteArray` - array of `byte` values
+* `PointerArray` - array of `pointer` values
 
 **Object Arrays:**
 * `ObjectArray` - array of any `Object`-derived types
@@ -84,9 +88,9 @@ Ovum provides specialized array classes for different element types (no generics
 
 **Array Creation:**
 ```ovum
-val numbers: IntArray = IntArray(10)        // Create array of Int reference wrappers
-val names: StringArray = StringArray(5)     // Create string array of size 5
-val objects: ObjectArray = ObjectArray(3)   // Create object array of size 3
+val numbers: IntArray = IntArray(10, -1)        // Create array of int with default value -1
+val names: StringArray = StringArray(5, "Null")     // Create string array of size 5 with default value "Null"
+val objects: ObjectArray = ObjectArray(3, "Test")   // Create object array of size 3 with default value String "Test"
 ```
 
 ## Type Aliases

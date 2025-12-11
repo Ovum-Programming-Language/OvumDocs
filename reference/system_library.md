@@ -38,21 +38,6 @@ The `sys` namespace provides essential system operations including I/O, time, pr
 
 ## File Operations
 
-### File Opening
-
-* `sys::OpenFile(path: String, mode: FileMode): File?` - Opens a file with specified mode
-* `sys::OpenFile(path: String, mode: FileMode, permissions: Int): File?` - Opens file with custom permissions
-
-### FileMode Enumeration
-
-* `sys::FileMode::Read` - Open for reading only
-* `sys::FileMode::Write` - Open for writing only (truncates existing file)
-* `sys::FileMode::Append` - Open for writing, append to end
-* `sys::FileMode::ReadWrite` - Open for both reading and writing
-* `sys::FileMode::Create` - Create new file, fail if exists
-* `sys::FileMode::CreateNew` - Create new file, fail if exists
-* `sys::FileMode::Truncate` - Open and truncate to zero length
-
 ### File System Operations
 
 * `sys::FileExists(path: String): Bool` - Checks if file exists
@@ -63,7 +48,6 @@ The `sys` namespace provides essential system operations including I/O, time, pr
 * `sys::MoveFile(source: String, destination: String): Bool` - Moves/renames file
 * `sys::CopyFile(source: String, destination: String): Bool` - Copies file
 * `sys::GetFileSize(path: String): Int?` - Returns file size in bytes, or `null` on error
-* `sys::GetFileModifiedTime(path: String): Int?` - Returns file modification time as Unix timestamp
 
 ### Directory Operations
 
@@ -101,13 +85,8 @@ The `sys` namespace provides essential system operations including I/O, time, pr
 * `sys::GetOsName(): String` - Returns operating system name
 * `sys::GetOsVersion(): String` - Returns operating system version
 * `sys::GetArchitecture(): String` - Returns CPU architecture (e.g., "x64", "arm64")
-* `sys::GetUserName(): String?` - Returns current username
-* `sys::GetHomeDirectory(): String?` - Returns user's home directory
-
-## Error Handling
-
-* `sys::GetLastError(): String?` - Returns description of last system error
-* `sys::ClearError(): Void` - Clears the last error state
+* `sys::GetUserName(): String` - Returns current username
+* `sys::GetHomeDirectory(): String` - Returns user's home directory
 
 ## Foreign Function Interface (FFI)
 
