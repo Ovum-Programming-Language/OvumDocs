@@ -255,6 +255,35 @@ function:2 _Point_IsLess_<C>_Object {
     Return
 }
 
+// Interface method: Equals (IComparable)
+function:2 _Point_Equals_<C>_Object {
+    LoadLocal 0  // this pointer
+    if {
+        LoadLocal 1  // other object
+        IsType Point
+        BoolNot
+    } then {
+        PushBool false
+        Return
+    }
+    if {
+        LoadLocal 1  // other (right operand)
+        GetField 0
+        LoadLocal 0  // this (left operand)
+        GetField 0
+        IntNotEqual  // this.x != other.x
+    } then {
+        PushBool false
+        Return
+    }
+    LoadLocal 1  // other (right operand)
+    GetField 1
+    LoadLocal 0  // this (left operand)
+    GetField 1
+    IntEqual  // this.y == other.y
+    Return
+}
+
 // Interface method: ToString (IStringConvertible)
 function:1 _Point_ToString_<C> {
     // "Point(" + Int(x).ToString()
@@ -308,14 +337,6 @@ function:1 _Global_Main_StringArray {
 
 **Ovum Source Code:**
 ```ovum
-interface IComparable {
-    fun IsLess(other: Object): Bool
-}
-
-interface IStringConvertible {
-    fun ToString(): String
-}
-
 class Point implements IComparable, IStringConvertible {
     public var x: int
     public var y: int
@@ -327,14 +348,14 @@ class Point implements IComparable, IStringConvertible {
     }
     
     public fun GetDistance(): Float {
-        return CalculateDistance(this.x, this.y)
+        return Float(CalculateDistance(this.x, this.y))
     }
     
     private fun CalculateDistance(x: int, y: int): float {
-        return sys::Sqrt(float(x * x + y * y))
+        return sys::Sqrt((this.x * this.x + this.y * this.y) as float)
     }
     
-    public override fun IsLess(other: Object): Bool {
+    public override fun IsLess(other: Object): bool {
         if (!(other is Point)) {
             return false
         }
@@ -348,8 +369,22 @@ class Point implements IComparable, IStringConvertible {
         return this.y < otherPoint.y
     }
     
+    public override fun Equals(other: Object): bool {
+        if (!(other is Point)) {
+            return false
+        }
+        
+        val otherPoint: Point = (other as Point) ?: Point(0, 0)
+        
+        if (this.x != otherPoint.x) {
+            return false
+        }
+        
+        return this.y == otherPoint.y
+    }
+    
     public override fun ToString(): String {
-        return "Point(" + Int(x).ToString() + ", " + Int(y).ToString() + ")"
+        return "Point(" + Int(this.x).ToString() + ", " + Int(this.y).ToString() + ")"
     }
 }
 
@@ -539,11 +574,11 @@ class Rectangle implements IShape {
     }
     
     public override fun GetArea(): Float {
-        return Width * Height
+        return Float(this.Width * this.Height)
     }
     
     public override fun GetPerimeter(): Float {
-        return 2.0 * (Width + Height)
+        return Float(2.0 * (this.Width + this.Height))
     }
 }
 
@@ -556,11 +591,11 @@ class Circle implements IShape {
     }
     
     public override fun GetArea(): Float {
-        return PI * Radius * Radius
+        return Float(PI * this.Radius * this.Radius)
     }
     
     public override fun GetPerimeter(): Float {
-        return 2.0 * PI * Radius
+        return Float(2.0 * PI * this.Radius)
     }
 }
 
@@ -573,10 +608,10 @@ fun ProcessShape(shape: IShape): String {
 fun Main(args: StringArray): int {
     val rectangle: Rectangle = Rectangle(5.0, 3.0)
     val circle: Circle = Circle(2.5)
-    val result_rectangle: String = ProcessShape(rectangle)
-    val result_circle: String = ProcessShape(circle)
-    sys::PrintLine(result_rectangle)
-    sys::PrintLine(result_circle)
+    val resultRectangle: String = ProcessShape(rectangle)
+    val resultCircle: String = ProcessShape(circle)
+    sys::PrintLine(resultRectangle)
+    sys::PrintLine(resultCircle)
     
     return 0
 }

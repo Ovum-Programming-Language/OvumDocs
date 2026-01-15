@@ -4,7 +4,9 @@ Ovum supports standard control flow constructs following structured programming 
 
 ## Conditional Execution
 
-**If/Else**: Conditional execution with syntax `if (condition) { ... } else { ... }`. The condition must be a Boolean expression (`Bool`). Braces are required for blocks, but for single statements the braces can be omitted (though using braces is encouraged for clarity).
+**If/Else**: Conditional execution with syntax `if (condition) { ... } else { ... }`. The condition must be a Boolean
+expression (`Bool`). Braces are required for blocks, but for single statements the braces can be omitted (though using
+braces is encouraged for clarity).
 
 ```ovum
 if (x > 0) {
@@ -24,7 +26,7 @@ if (x > 0) {
 var i: Int = 0
 while (i < 10) {
     sys::Print(i.ToString())
-    i = i + 1
+    i := i + 1
 }
 ```
 
@@ -38,7 +40,8 @@ for (item in items) {
 
 ## Flow Control
 
-**Return**: `return expression;` exits the current function with the given value (or `return;` with no value to exit a void function). In pure functions, a return simply provides the result; in impure, it may terminate early as usual.
+**Return**: `return expression` exits the current function with the given value (or `return` with no value to exit a
+void function).
 
 **Break/Continue**: `break` exits a loop immediately, `continue` skips to the next iteration of the loop.
 

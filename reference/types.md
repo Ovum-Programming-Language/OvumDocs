@@ -1,6 +1,7 @@
 # Types
 
-Ovum has a rich type system with primitive types and user-defined types. The type system is static and does not permit implicit type coercions (an `Int` won't automatically become a `Float` without an explicit cast, for example).
+Ovum has a rich type system with primitive types and user-defined types. The type system is static and does not permit
+implicit type coercions (an `Int` won't automatically become a `Float` without an explicit cast, for example).
 
 ## Fundamental Types
 
@@ -9,29 +10,31 @@ Fundamental types are passed by value and represent the basic building blocks of
 ### Numeric Types
 
 * **`int`** (8 bytes) - 64-bit signed integer
-  * Literals: `42`, `-17`, `0x1A` (hex), `0b1010` (binary)
-  
+    * Literals: `42`, `-17`, `0x1A` (hex), `0b1010` (binary)
+
 * **`float`** (8 bytes) - 64-bit floating-point number (IEEE 754 double precision)
-  * Literals: `3.14`, `2.0e10`, `1.5E-3`, `.5`, `5.`
-  * Special values: `Infinity`, `-Infinity`, `NaN`
+    * Literals: `3.14`, `2.0e10`, `1.5E-3`, `.5`, `5.`
+    * Special values: `Infinity`, `-Infinity`, `NaN`
 
 * **`byte`** (1 byte) - 8-bit unsigned integer
-  * Literals: `255`, `0x00`, `0b11111111`
+    * Literals: `255`, `0x00`, `0b11111111`
 
 ### Character and Boolean Types
 
 * **`char`** - single Unicode character (UTF-32)
-  * Literals: `'A'`, `'中'`, `'\n'`, `'\t'`, `'\0'`
+    * Literals: `'A'`, `'中'`, `'\n'`, `'\t'`, `'\0'`
 
 * **`bool`** - Boolean value (`true`, `false`)
-  * Any value can be explicitly cast to `bool`
+    * Any value can be explicitly cast to `bool`
 
 ### Low-Level Types
 
 * **`pointer`** - raw memory address *(only meaningful in `unsafe` code)*
-  * Used for FFI and low-level memory operations
+    * Used for FFI and low-level memory operations
 
-> **Fundamental Type Constraints**: Fundamental types cannot be made nullable (`int?` is invalid). They are not `Object` types and cannot be stored in `ObjectArray` or cast to `Object`. To convert nullable primitives to fundamentals, cast to primitive first: `(nullableInt as Int) as int`.
+> **Fundamental Type Constraints**: Fundamental types cannot be made nullable (`int?` is invalid). They are not `Object`
+> types and cannot be stored in `ObjectArray` or cast to `Object`. To convert nullable primitives to fundamentals, cast to
+> primitive first: `(nullableInt as Int) as int`.
 
 ## Primitive Reference Types
 
@@ -40,7 +43,7 @@ Primitive reference types are built-in reference wrappers around fundamental typ
 ### Numeric Reference Types
 
 * **`Int`** - reference wrapper for `int` values
-* **`Float`** - reference wrapper for `float` values  
+* **`Float`** - reference wrapper for `float` values
 * **`Byte`** - reference wrapper for `byte` values
 
 ### Character and Boolean Reference Types
@@ -48,33 +51,37 @@ Primitive reference types are built-in reference wrappers around fundamental typ
 * **`Char`** - reference wrapper for `char` values
 * **`Bool`** - reference wrapper for `bool` values
 
+Can be copy assigned via `:=` from fundamental types.
+
 ### Low-Level Reference Types
 
 * **`Pointer`** - reference wrapper for `pointer` values *(only meaningful in `unsafe` code)*
 
-> **Nullable Primitives**: Any primitive reference type can be made nullable by appending `?` (e.g., `Int?`, `Float?`, `Bool?`).
+> **Nullable Primitives**: Any primitive reference type can be made nullable by appending `?` (e.g., `Int?`, `Float?`,
+`Bool?`).
 
 ## Reference Types
 
 ### Built-in Reference Types
 
 * **`String`** - immutable text data (UTF-8 encoded)
-  * Literals: `"Hello"`, `"Multi-line\nstring"`, `""` (empty string)
-  * Concatenation: `"Hello" + " " + "World"`
+    * Literals: `"Hello"`, `"Multi-line\nstring"`, `""` (empty string)
+    * Concatenation: `"Hello" + " " + "World"`
 
 * **`File`** - file operations
-  * Literals: `sys::OpenFile("data.txt", "r")`
-  * Methods: `Read(): ByteArray`, `ReadLine(): String`, `Write(data: ByteArray): Bool`, `WriteLine(text: String): Bool`, `Close(): Void`, `IsOpen(): Bool`
+    * Methods: `Read(size: int): ByteArray`, `ReadLine(): String`, `Write(data: ByteArray): int`,
+      `WriteLine(text: String): Void`, `Close(): Void`, `IsOpen(): Bool`
 
 * **`Object`** - root of all reference types
-  * Implicit base class for all user-defined types
-  * Contains only a virtual destructor
+    * Implicit base class for all user-defined types
+    * Contains only a virtual destructor
 
 ### Array Types
 
 Ovum provides specialized array classes for different element types (no generics/templates):
 
 **Primitive Arrays:**
+
 * `IntArray` - array of `int` values
 * `FloatArray` - array of `float` values
 * `BoolArray` - array of `bool` values
@@ -83,15 +90,19 @@ Ovum provides specialized array classes for different element types (no generics
 * `PointerArray` - array of `pointer` values
 
 **Object Arrays:**
+
 * `ObjectArray` - array of any `Object`-derived types
 * `StringArray` - convenience array of `String` (used for `Main` function arguments)
 
 **Array Creation:**
+
 ```ovum
 val numbers: IntArray = IntArray(10, -1)        // Create array of int with default value -1
 val names: StringArray = StringArray(5, "Null")     // Create string array of size 5 with default value "Null"
 val objects: ObjectArray = ObjectArray(3, "Test")   // Create object array of size 3 with default value String "Test"
 ```
+
+See more in [Built-in Types](builtin_types.md).
 
 ## Type Aliases
 
@@ -105,7 +116,6 @@ fun ProcessUser(id: UserId, name: UserName): Void {
     // Implementation
 }
 ```
-
 
 ## Assignment Operators
 
@@ -124,7 +134,11 @@ The copy assignment operator performs deep copy for reference types:
 
 ```ovum
 val original: String = "Hello"
-val copy: String := original  // Creates a new string with the same content
+var copy: String = "Old Value"
+copy := original  // Copies content without instantiation
+
+var i: Int = 42
+i := 100  // Copy assignment from fundamental int to Int
 ```
 
 ## Type Casting
@@ -193,40 +207,47 @@ unsafe {
 ## Passing Semantics
 
 **Fundamental types** (`int`, `float`, `byte`, `char`, `bool`, `pointer`) are passed by value (copied):
+
 ```ovum
 fun ModifyInt(x: int): Void {
     x = x + 1  // Only modifies the local copy
 }
 ```
 
-**Primitive reference types** (`Int`, `Float`, `Byte`, `Char`, `Bool`, `Pointer`) and **all other reference types** (including `String`, arrays, and user-defined types) are passed by reference:
+**Primitive reference types** (`Int`, `Float`, `Byte`, `Char`, `Bool`, `Pointer`) and **all other reference types** (
+including `String`, arrays, and user-defined types) are passed by reference:
+
 ```ovum
 fun ModifyIntRef(var x: Int): Void {
     x = x + 1  // Implicit conversion: Int + int -> Int
 }
 
-fun ModifyArray(arr: IntArray): Void {
-    arr[0] := Int(999)  // Use := for deep copy assignment
+fun ModifyArray(var arr: IntArray): Void {
+    arr[0] = 999
 }
 ```
 
 **Immutability:** References are immutable by default - use `var` for mutable references:
+
 ```ovum
 fun CannotReassign(str: String): Void {
     // str = "New value"  // ERROR: Cannot reassign immutable reference
 }
 
 fun CanReassign(var str: String): Void {
-    str = "New value"  // OK: str is mutable
+    str := "New value"  // OK: str is mutable
 }
 ```
 
 ## Type System Characteristics
 
 **Static typing:** Every variable and expression has a type checked at compile time
-**Limited implicit conversions:** The compiler only performs implicit conversions between a primitive reference type and its matching fundamental (for example, `Int` ↔ `int`). Any conversion across different primitive families—such as `Int` to `Float` or `Float` to `int`—must use an explicit cast.
+**Limited implicit conversions:** The compiler only performs implicit conversions between a primitive reference type and
+its matching fundamental (for example, `Int` ↔ `int`). Any conversion across different primitive families—such as `Int`
+to `Float` or `Float` to `int`—must use an explicit cast.
 **Type safety:** Prevents many common errors
-**Nullable types:** Any reference type (including primitive reference types) can be made nullable by appending `?`. Fundamental types cannot be nullable.
+**Nullable types:** Any reference type (including primitive reference types) can be made nullable by appending `?`.
+Fundamental types cannot be nullable.
 
 ```ovum
 val x: int = 42

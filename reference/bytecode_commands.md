@@ -184,8 +184,8 @@ All commands expect arguments of proper size on the stack and push return value 
 * `SleepNs` - Sleeps for specified nanoseconds
 * `Exit` - Terminates process with exit code
 * `GetProcessId` - Gets current process ID
-* `GetEnvironmentVariable` - Gets environment variable
-* `SetEnvironmentVariable` - Sets environment variable
+* `GetEnvironmentVar` - Gets environment variable
+* `SetEnvironmentVar` - Sets environment variable
 
 ## Random Number Generation
 

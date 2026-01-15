@@ -9,9 +9,9 @@ Global mutable state is unsafe because it can be accessed from anywhere:
 ```ovum
 unsafe {
     global var globalCounter: Int = 0
-    globalCounter = globalCounter + 1
+    globalCounter := globalCounter + 1
     
-    static var staticValue: String = "initial"
+    global var staticValue: String = "initial"
     staticValue = "modified"
 }
 ```

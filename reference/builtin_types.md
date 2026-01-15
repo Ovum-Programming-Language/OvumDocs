@@ -1,17 +1,19 @@
 # Built-in Reference Types
 
-This document describes the built-in reference types in Ovum, their methods, and the standard interfaces that all types implement.
+This document describes the built-in reference types in Ovum, their methods, and the standard interfaces that all types
+implement.
 
 ## String Type
 
-`String` is a reference type (not primitive) for text data. All strings are immutable by default and implement `IStringConvertible`, `IComparable`, and `IHashable`.
+`String` is a reference type (not primitive) for text data. All strings are immutable by default and implement
+`IStringConvertible`, `IComparable`, and `IHashable`.
 
 ### String Methods
 
-* `Length(): Int` - Returns the number of characters in the string
+* `Length(): int` - Returns the number of characters in the string
 * `ToString(): String` - Returns the string itself (implements `IStringConvertible`)
-* `IsLess(other: Object): Bool` - Lexicographic comparison (implements `IComparable`)
-* `GetHash(): Int` - Returns hash code for the string (implements `IHashable`)
+* `IsLess(other: Object): bool` - Lexicographic comparison (implements `IComparable`)
+* `GetHash(): int` - Returns hash code for the string (implements `IHashable`)
 * `+` operator - String concatenation (e.g., `"Hello" + " " + "World"`)
 
 ### String Usage
@@ -24,17 +26,19 @@ val combined: String = "Hello" + ", " + "World!"
 // String comparison
 val a: String = "apple"
 val b: String = "banana"
-val isLess: Bool = a.IsLess(b)  // true (lexicographic order)
+val isLess: bool = a.IsLess(b)  // true (lexicographic order)
 
 // String hashing
-val hash: Int = greeting.GetHash()
+val hash: int = greeting.GetHash()
 ```
 
 ## Nullable Types
 
-> **Note**: For detailed information about nullable types, see [`nullable.md`](nullable.md). This section only covers basic information.
+> **Note**: For detailed information about nullable types, see [`nullable.md`](nullable.md). This section only covers
+> basic information.
 
-Any primitive type can be made nullable by appending `?` (e.g., `Int?`, `String?`). Nullable types are passed by reference and can hold either a value or `null`.
+Any primitive type can be made nullable by appending `?` (e.g., `Int?`, `String?`). Nullable types are passed by
+reference and can hold either a value or `null`.
 
 **Important**: You cannot directly call methods on nullable types using `.` - you must use the safe call operator `?.`.
 
@@ -46,12 +50,14 @@ val safeLength: Int = nullableString?.Length() ?: 0  // Correct: Use safe call
 
 ## Array Types
 
-Ovum provides specialized array classes for different data types. Arrays are reference types and support indexing, iteration, and length operations. All array types implement `IStringConvertible`, `IComparable`, and `IHashable`.
+Ovum provides specialized array classes for different data types. Arrays are reference types and support indexing,
+iteration, and length operations. All arrays have dynamic length. All array types implement `IComparable` and
+`IHashable`.
 
 ### Primitive Arrays
 
 * `IntArray` - Array of 64-bit signed integers
-* `FloatArray` - Array of 64-bit floating-point numbers  
+* `FloatArray` - Array of 64-bit floating-point numbers
 * `BoolArray` - Array of Boolean values
 * `CharArray` - Array of characters
 * `ByteArray` - Array of 8-bit unsigned integers
@@ -64,63 +70,46 @@ Ovum provides specialized array classes for different data types. Arrays are ref
 
 ## File Type
 
-`File` is a reference type for file operations. Files are nullable by default (`File?`) since file operations can fail. The `File` type implements `IStringConvertible`, `IComparable`, and `IHashable`.
+`File` is a reference type for file operations.
 
 ### File Methods
 
-* `ReadAllBytes(): ByteArray?` - Reads all bytes from the file, returns `null` on error
-* `ReadAllText(): String?` - Reads all text from the file as UTF-8, returns `null` on error
-* `WriteAllBytes(data: ByteArray): Bool` - Writes all bytes to the file, returns `false` on error
-* `WriteAllText(text: String): Bool` - Writes all text to the file as UTF-8, returns `false` on error
-* `AppendText(text: String): Bool` - Appends text to the file, returns `false` on error
+* `Read(size: int): ByteArray` - Reads given amount bytes from the file
+* `ReadLine(): String` - Reads all text from the file as UTF-8, returns `null` on error
+* `Write(data: ByteArray): int` - Writes all bytes to the file, returns number of bytes written
+* `WriteLine(text: String): Void` - Writes a string to file with `'\n'`
+* `Open(path: String, mode: String): Void` - Opens the file at the given path with the specified mode
 * `Close(): Void` - Closes the file handle
-* `IsOpen(): Bool` - Returns `true` if the file is currently open
-* `GetSize(): Int?` - Returns file size in bytes, or `null` if error
-* `ToString(): String` - Returns file path (implements `IStringConvertible`)
-* `IsLess(other: Object): Bool` - Compares file paths lexicographically (implements `IComparable`)
-* `GetHash(): Int` - Returns hash of file path (implements `IHashable`)
-
-### File Usage
-
-```ovum
-// File operations
-val file: File? = sys::OpenFile("data.txt", sys::FileMode::Read)
-if (file != null) {
-    val content: String? = file.ReadAllText()
-    if (content != null) {
-        sys::Print("File content: " + content)
-    }
-    file.Close()
-}
-
-// Writing to file
-val outputFile: File? = sys::OpenFile("output.txt", sys::FileMode::Write)
-if (outputFile != null) {
-    val success: Bool = outputFile.WriteAllText("Hello, World!")
-    if (success) {
-        sys::Print("File written successfully")
-    }
-    outputFile.Close()
-}
-
-// File comparison
-val file1: File? = sys::OpenFile("a.txt", sys::FileMode::Read)
-val file2: File? = sys::OpenFile("b.txt", sys::FileMode::Read)
-if (file1 != null && file2 != null) {
-    val isLess: Bool = file1.IsLess(file2)  // Compares file paths
-}
-```
+* `IsOpen(): bool` - Returns `true` if the file is currently open
+* `Eof(): bool` - Returns `true` if the end of the file has been reached
+* `Seek(position: int): void` - Sets the file position
+* `Tell(): int` - Returns the current file position
 
 ### Array Methods
 
 All array types support the following methods:
 
-* `Length(): Int` - Returns the number of elements in the array
+* `Length(): int` - Returns the number of elements in the array
 * `[index]: ElementType` - Indexing operator for element access
 * `[index] = value` - Assignment operator for mutable arrays
 * `ToString(): String` - String representation of the array (implements `IStringConvertible`)
-* `IsLess(other: Object): Bool` - Lexicographic comparison of array elements (implements `IComparable`)
+* `IsLess(other: Object): bool` - Lexicographic comparison of array elements (implements `IComparable`)
+* `Equals(other: Object): bool` - Equality comparison of array contents (implements `IComparable`)
 * `GetHash(): Int` - Hash code based on array contents (implements `IHashable`)
+* `Reserve(newCapacity: int): Void` - Reserves capacity for the array
+* `ShrinkToFit(): Void` - Shrinks the array capacity to fit its size
+* `Clear(): Void` - Clears all elements from the array
+* `Add(value: ElementType): Void` - Appends an element to the end of the array
+* `InsertAt(index: int, value: ElementType): Void` - Inserts an element at the specified index
+* `RemoveAt(index: int): Void` - Removes the element at the specified index
+
+
+All of them can be created with a specified length:
+
+```ovum
+var intArr: IntArray = IntArray(10, 0)  // Array of 10 integers
+var floatArr: FloatArray = FloatArray(5, 0.0)  // Array of 5 floats
+```
 
 ### Array Usage
 
@@ -135,7 +124,7 @@ val count: Int = numbers.Length()  // Returns 3
 
 // Iteration
 for (num in numbers) {
-    sys::Print(num.ToString())
+    sys::Print(Int(num).ToString())
 }
 
 // Array comparison
@@ -168,14 +157,17 @@ All types in Ovum implicitly implement certain standard interfaces that provide 
 ### Object (Root Interface)
 
 The implicit root interface for all types. Provides:
+
 * `destructor(): Void` - Virtual destructor called by GC during finalization
 
 ### IStringConvertible
 
 Provides string conversion capability:
+
 * `ToString(): String` - Converts the object to its string representation
 
 All built-in types implement this interface:
+
 ```ovum
 val num: Int = 42
 val str: String = num.ToString()  // "42"
@@ -187,20 +179,24 @@ val flagStr: String = flag.ToString()  // "true"
 ### IComparable
 
 Provides ordering capability for sorting and comparison:
-* `IsLess(other: Object): Bool` - Returns true if this object is less than the other
+
+* `IsLess(other: Object): bool` - Returns true if this object is less than the other
+* `Equals(other: Object): bool` - Returns true if this object is equal to the other
 
 Required for user-defined types used as parameters to pure functions (ensures stable ordering).
 
 ```ovum
 val a: Int = 5
 val b: Int = 10
-val isLess: Bool = a.IsLess(b)  // true
+val isLess: bool = a.IsLess(b)  // true
+val isEqual: bool = a.Equals(b)  // false
 ```
 
 ### IHashable
 
 Provides hashing capability for use in hash tables and caching:
-* `GetHash(): Int` - Returns a hash code for the object
+
+* `GetHash(): int` - Returns a hash code for the object
 
 ```ovum
 val text: String = "Hello"

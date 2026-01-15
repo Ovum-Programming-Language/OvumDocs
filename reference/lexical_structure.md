@@ -10,7 +10,7 @@ Names for variables, functions, classes, etc., consist of letters, digits, and u
 
 ## Keywords
 
-Ovum reserves certain words like `fun`, `class`, `interface`, `var`, `override`, `pure`, `if`, `else`, `for`, `while`, `return`, `unsafe`, `val`, `static`, `public`, `private`, `implements`, `as`, `is`, `null`, `true`, `false`, `typealias`, `destructor`, `call`, etc. These cannot be used as identifiers.
+Ovum reserves certain words like `fun`, `class`, `interface`, `var`, `override`, `pure`, `if`, `else`, `for`, `while`, `return`, `unsafe`, `val`, `global`, `public`, `private`, `implements`, `as`, `is`, `null`, `true`, `false`, `typealias`, `destructor`, `call`, etc. These cannot be used as identifiers.
 
 ## Literals
 
@@ -66,7 +66,7 @@ ClassBody       ::= "{" { ClassMember } "}" ;
 ClassMember     ::= FieldDecl | StaticFieldDecl | MethodDecl | DestructorDecl | CallDecl ;
 
 FieldDecl       ::= ( "private" | "public" ) ( "val" | "var" ) Identifier ":" Type [ "=" Expression ] ";" ;
-StaticFieldDecl ::= "static" ( "private" | "public" ) ( "val" | "var" ) Identifier ":" Type [ "=" Expression ] ";" ;
+StaticFieldDecl ::= "global" ( "private" | "public" ) ( "val" | "var" ) Identifier ":" Type [ "=" Expression ] ";" ;
 
 MethodDecl      ::= ( "private" | "public" ) [ "override" ] [ "pure" ]
                     "fun" Identifier "(" [ ParamList ] ")" [ ":" Type ] ( Block | ";" ) ;

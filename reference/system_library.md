@@ -1,13 +1,14 @@
 # System Library & Interop
 
-The `sys` namespace provides essential system operations including I/O, time, process control, and foreign function interface capabilities.
+The `sys` namespace provides essential system operations including I/O, time, process control, and foreign function
+interface capabilities.
 
 ## Basic I/O
 
 * `sys::Print(msg: String): Void` - Prints a string to standard output
 * `sys::PrintLine(msg: String): Void` - Prints a string followed by a newline
-* `sys::ReadLine(): String?` - Reads a line from standard input, returns `null` on EOF
-* `sys::ReadChar(): Char?` - Reads a single character from standard input, returns `null` on EOF
+* `sys::ReadLine(): String` - Reads a line from standard input, returns `null` on EOF
+* `sys::ReadChar(): Char` - Reads a single character from standard input, returns `null` on EOF
 
 ## Time and Date Operations
 
@@ -20,9 +21,8 @@ The `sys` namespace provides essential system operations including I/O, time, pr
 
 ### Date/Time Formatting
 
-* `sys::FormatDateTime(timestamp: Int, format: String): String?` - Formats Unix timestamp using format string
-* `sys::FormatDateTimeMs(timestampMs: Int, format: String): String?` - Formats millisecond timestamp
-* `sys::ParseDateTime(dateString: String, format: String): Int?` - Parses date string to Unix timestamp
+* `sys::FormatDateTime(timestamp: Int, format: String): String` - Formats Unix timestamp using format string
+* `sys::ParseDateTime(dateString: String, format: String): Int` - Parses date string to Unix timestamp
 
 ### Common Format Specifiers
 
@@ -33,27 +33,24 @@ The `sys` namespace provides essential system operations including I/O, time, pr
 * `%M` - Minute (00-59)
 * `%S` - Second (00-59)
 * `%s` - Unix timestamp
-* `%f` - Microseconds (000000-999999)
-* `%n` - Nanoseconds (000000000-999999999)
 
 ## File Operations
 
 ### File System Operations
 
-* `sys::FileExists(path: String): Bool` - Checks if file exists
-* `sys::DirectoryExists(path: String): Bool` - Checks if directory exists
-* `sys::CreateDirectory(path: String): Bool` - Creates directory, returns `false` on error
-* `sys::DeleteFile(path: String): Bool` - Deletes file, returns `false` on error
-* `sys::DeleteDirectory(path: String): Bool` - Deletes empty directory, returns `false` on error
-* `sys::MoveFile(source: String, destination: String): Bool` - Moves/renames file
-* `sys::CopyFile(source: String, destination: String): Bool` - Copies file
-* `sys::GetFileSize(path: String): Int?` - Returns file size in bytes, or `null` on error
+* `sys::FileExists(path: String): bool` - Checks if file exists
+* `sys::DirectoryExists(path: String): bool` - Checks if directory exists
+* `sys::CreateDirectory(path: String): bool` - Creates directory, returns `false` on error
+* `sys::DeleteFile(path: String): bool` - Deletes file, returns `false` on error
+* `sys::DeleteDirectory(path: String): bool` - Deletes empty directory, returns `false` on error
+* `sys::MoveFile(source: String, destination: String): bool` - Moves/renames file
+* `sys::CopyFile(source: String, destination: String): bool` - Copies file
 
 ### Directory Operations
 
 * `sys::ListDirectory(path: String): StringArray?` - Lists directory contents, returns `null` on error
 * `sys::GetCurrentDirectory(): String?` - Returns current working directory
-* `sys::ChangeDirectory(path: String): Bool` - Changes current directory, returns `false` on error
+* `sys::ChangeDirectory(path: String): bool` - Changes current directory, returns `false` on error
 * `sys::GetAbsolutePath(path: String): String?` - Returns absolute path, or `null` on error
 
 ## Process Control
@@ -63,7 +60,7 @@ The `sys` namespace provides essential system operations including I/O, time, pr
 * `sys::Exit(code: Int): Never` - Terminates the process with exit code
 * `sys::GetProcessId(): Int` - Returns current process ID
 * `sys::GetEnvironmentVariable(name: String): String?` - Gets environment variable value
-* `sys::SetEnvironmentVariable(name: String, value: String): Bool` - Sets environment variable
+* `sys::SetEnvironmentVariable(name: String, value: String): bool` - Sets environment variable
 
 ## Random Number Generation
 
@@ -91,10 +88,10 @@ The `sys` namespace provides essential system operations including I/O, time, pr
 ## Foreign Function Interface (FFI)
 
 * `sys::Interope(dllName: String, functionName: String, input: ByteArray, output: ByteArray): Int`
-  * **All interop calls are `unsafe`.**
-  * Returns 0 on success, non-zero error code on failure
-  * `input` contains parameters to pass to the function
-  * `output` buffer receives the function's return value
+    * **All interop calls are `unsafe`.**
+    * Returns 0 on success, non-zero error code on failure
+    * `input` contains parameters to pass to the function
+    * `output` buffer receives the function's return value
 
 ## Usage Examples
 
@@ -123,37 +120,29 @@ sys::PrintLine("Operation took " + duration.ToString() + " nanoseconds")
 ### File Operations
 
 ```ovum
-// Read and write files
-val file: File? = sys::OpenFile("data.txt", sys::FileMode::Read)
-if (file != null) {
-    val content: String? = file.ReadAllText()
-    if (content != null) {
-        sys::PrintLine("File content: " + content)
-    }
-    file.Close()
-}
+val path : String = "TEMP_OVUM_FILE.txt"
+val copyPath : String = "COPY_TEMP_OVUM_FILE.txt"
+val content : String = "quidquid id est, timeo Danaos et dona ferentes."
+val contentBytes : ByteArray = content.ToUtf8Bytes()
+contentBytes.RemoveAt(-1) // circular indexing
 
-// Write to file
-val outputFile: File? = sys::OpenFile("output.txt", sys::FileMode::Write)
-if (outputFile != null) {
-    val success: Bool = outputFile.WriteAllText("Hello, World!")
-    if (success) {
-        sys::PrintLine("File written successfully")
-    }
-    outputFile.Close()
-}
+var file : File = File()
+file.Open(path, "w")
+file.WriteLine(content)
+file.Close()
 
-// Directory operations
-if (sys::CreateDirectory("new_folder")) {
-    sys::PrintLine("Directory created")
-}
+var readFile : File = File()
+readFile.Open(path, "r")
+val extractedContent : String = readFile.ReadLine()
+readFile.Close()
+sys::PrintLine(extractedContent)
 
-val files: StringArray? = sys::ListDirectory(".")
-if (files != null) {
-    for (filename in files) {
-        sys::PrintLine("File: " + filename)
-    }
-}
+sys::CopyFile(path, copyPath)
+
+var copyFile : File = File()
+copyFile.Open(path, "r")
+var extractedBytes : ByteArray = copyFile.Read(content.Length())
+copyFile.Close()
 ```
 
 ### System Information
