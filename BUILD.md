@@ -1,6 +1,6 @@
 # Build instructions for Ovum toolset
 
-This documents describes build process for Ovum programming language toolset and tests.
+This document describes a build process for Ovum programming language toolset and tests.
 
 ## How to build and run
 
@@ -23,13 +23,13 @@ cmake --build cmake-build
 * On Windows:
 
 ```shell
-.\cmake-build\ovum.exe
+.\cmake-build\ovum.exe build
 ```
 
 * On *nix:
 
 ```shell
-./cmake-build/bin/ovum World
+./cmake-build/bin/ovum build
 ```
 
 5. Run tests

@@ -1,13 +1,14 @@
 # Code Examples
 
 Here are some code examples to help you get started with Ovum.
+See more examples in the [OvumExamples](https://github.com/Ovum-Programming-Language/OvumExamples) repository.
 
 ## 1) Entry point (`StringArray`)
 
 ```ovum
 // .ovum file
-fun Main(args: StringArray): Int {
-    val count: Int = args.Length()  // Built-in returns Int
+fun Main(args: StringArray): int {
+    val count: Int = args.Length()  // Built-in returns int
     sys::Print("Args count: " + count.ToString())
     return 0
 }
@@ -62,33 +63,58 @@ class FriendlyGreeter implements IGreeter {
 ## 4) Standard Interfaces (`IStringConvertible`, `IComparable`, `IHashable`)
 
 ```ovum
-interface IStringConvertible { fun ToString(): String }
-interface IComparable        { fun IsLess(other: Object): Bool }
-interface IHashable          { fun GetHash(): Int }
-
-class Point implements IStringConvertible, IComparable, IHashable {
-    public val X: int
-    public val Y: int
-
-    public fun Point(x: int, y: int): Point { this.X = x; this.Y = y; return this; }
-
-    public override fun ToString(): String {
-        return "(" + Int(X).ToString() + ", " + Int(Y).ToString() + ")"
+class Point implements IComparable, IStringConvertible {
+    public var x: int
+    public var y: int
+    
+    public fun Point(x: int, y: int): Point {
+        this.x = x
+        this.y = y
+        return this
     }
-
-    public override fun IsLess(other: Object): Bool {
-        if (!(other is Point)) return false
-        val p: Point? = other as Point
-        if (p != null) {
-            val nonNullP: Point = p ?: Point(0, 0)  // Use Elvis operator
-            if (this.X != nonNullP.X) return this.X < nonNullP.X
-            return this.Y < nonNullP.Y
+    
+    public fun GetDistance(): Float {
+        return Float(CalculateDistance(this.x, this.y))
+    }
+    
+    private fun CalculateDistance(x: int, y: int): float {
+        return sys::Sqrt((this.x * this.x + this.y * this.y) as float)
+    }
+    
+    public override fun IsLess(other: Object): bool {
+        if (!(other is Point)) {
+            return false
         }
-        return false
+        
+        val otherPoint: Point = (other as Point) ?: Point(0, 0)
+        
+        if (this.x != otherPoint.x) {
+            return this.x < otherPoint.x
+        }
+        
+        return this.y < otherPoint.y
+    }
+    
+    public override fun Equals(other: Object): bool {
+        if (!(other is Point)) {
+            return false
+        }
+        
+        val otherPoint: Point = (other as Point) ?: Point(0, 0)
+        
+        if (this.x != otherPoint.x) {
+            return false
+        }
+        
+        return this.y == otherPoint.y
+    }
+    
+    public override fun ToString(): String {
+        return "Point(" + Int(this.x).ToString() + ", " + Int(this.y).ToString() + ")"
     }
 
     public override fun GetHash(): Int {
-        val hash: int = (X * 1315423911) ^ (Y * 2654435761)
+        val hash: int = (this.x * 1315423911) ^ (this.y * 2654435761)
         return Int(hash)
     }
 }
@@ -126,8 +152,8 @@ fun DemoCasts(obj: Object): Void {
 
     // Unsafe: raw byte views
     unsafe {
-        val bytesConst: ByteArray = (obj as ByteArray)
-        val bytesMut  : ByteArray = (obj as var ByteArray)
+        val bytesConst: ByteArray = ByteArray(obj)
+        var bytesMut  : Object = (obj as var Object)
     }
 }
 ```
@@ -152,11 +178,11 @@ class DefinedFunctional {
     }
 }
 
-val AddNullable: CustomFunctional = pure fun(a: Int?, b: Int?): Int {
+val AddNullable: CustomFunctional = pure fun(a: Int?, b: Int?): int {
     return (a ?: 0) + (b ?: 0)
 }
 
-fun Main(args: StringArray): Int {
+fun Main(args: StringArray): int {
     return AddNullable(2, DefinedFunctional(-1)(2))
 }
 ```
@@ -165,26 +191,26 @@ fun Main(args: StringArray): Int {
 
 ```ovum
 fun DemoControlFlow(): Void {
-    var i: int = 0
+    var i: Int = 0
     
     // While loop with break and continue
     while (i < 10) {
         if (i == 3) {
-            i = i + 1
+            i := i + 1
             continue  // Skip to next iteration
         }
         if (i == 7) {
             break  // Exit loop
         }
-        sys::Print("i = " + Int(i).ToString())
-        i = i + 1
+        sys::Print("i = " + i.ToString())
+        i := i + 1
     }
     
     // For loop over array
     val numbers: IntArray = IntArray(3)
-    numbers[0] := 10
-    numbers[1] := 20
-    numbers[2] := 30
+    numbers[0] = 10
+    numbers[1] = 20
+    numbers[2] = 30
     
     for (num in numbers) {
         sys::Print("Number: " + num.ToString())
@@ -248,7 +274,6 @@ fun ProcessUsers(users: UserList): Void {
     }
 }
 ```
-
 
 ## 11) Memory Management and Destructors
 

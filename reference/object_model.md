@@ -42,7 +42,7 @@ class Person implements IStringConvertible {
     }
     
     public override fun ToString(): String {
-        return Name + " (" + Age.ToString() + ")"
+        return this.Name + " (" + this.Age.ToString() + ")"
     }
 }
 ```
@@ -53,8 +53,8 @@ Provides ordering capability for sorting and comparison:
 
 ```ovum
 interface IComparable {
-    fun IsLess(other: Object): Bool
-    fun Equals(other: Object): Bool
+    fun IsLess(other: Object): bool
+    fun Equals(other: Object): bool
 }
 
 class Point implements IComparable {
@@ -67,14 +67,14 @@ class Point implements IComparable {
         return this
     }
     
-    public override fun IsLess(other: Object): Bool {
+    public override fun IsLess(other: Object): bool {
         if (!(other is Point)) return false
         val p: Point = (other as Point) ?: Point(0, 0)
         if (this.X != p.X) return this.X < p.X
         return this.Y < p.Y
     }
 
-    public override fun Equals(other: Object): Bool {
+    public override fun Equals(other: Object): bool {
         if (!(other is Point)) return false
         val p: Point = (other as Point) ?: Point(0, 0)
         return this.X == p.X && this.Y == p.Y
@@ -90,15 +90,15 @@ Provides hash code generation for use in hash tables:
 
 ```ovum
 interface IHashable {
-    fun GetHash(): Int
+    fun GetHash(): int
 }
 
 class Point implements IHashable {
     public val X: Int
     public val Y: Int
     
-    public override fun GetHash(): Int {
-        return (X * 1315423911) ^ (Y * 2654435761)
+    public override fun GetHash(): int {
+        return (this.X * 1315423911) ^ (this.Y * 2654435761)
     }
 }
 ```
